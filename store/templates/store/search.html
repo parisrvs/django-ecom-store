@@ -1,0 +1,28 @@
+{% extends 'store/layout/layout.html' %}
+{% load static %}
+
+
+{% block title %}Search{% endblock %}
+{% block style %}{% endblock %}
+
+{% block body %}
+<div class="container text-center mt-2 mb-2">
+    {% if products %}
+    {% include 'store/includes/products.html' with products=products search=search q=q %}
+    <div>{% include 'store/pagination.html' with page_obj=products %}</div>
+    {% else %}
+    <span class="position-fixed top-50 start-50 translate-middle badge bg-dark text-white fs-4 rounded-pill">
+        Results
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            0
+        </span>
+    </span>
+    {% endif %}
+</div>
+{% include 'store/modals/homepage.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'store/js/homepage.js' %}"></script>
+{% include 'store/handlebars/homepage.html' %}
+{% endblock %}

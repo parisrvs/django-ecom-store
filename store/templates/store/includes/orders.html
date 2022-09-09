@@ -1,0 +1,104 @@
+<div class="row text-start">
+    <div class="col-12 col-md-6">
+        <div>{{order.address.first_name}} {{order.address.last_name}}</div>
+        <div><i class="bi bi-mailbox"></i><span class="ms-2">Delivery Address</span></div>
+        <div class="ms-4">{{order.address.address1}}</div>
+        {% if order.address.address2 %}<div class="ms-4">{{order.address.address2}}</div>{% endif %}
+        <div class="ms-4">{{order.address.city}} - {{order.address.pincode}}</div>
+        <div class="ms-4">{{order.address.state}}, {{order.address.country}}</div>
+        <div class="ms-4">{{order.address.landmark}}</div>
+        <div><i class="bi bi-phone"></i><span class="ms-2">{{order.address.mobile}}</span></div>
+        {% if order.address.homephone %}
+        <div><i class="bi bi-telephone"></i><span class="ms-2">{{order.address.homephone}}</span></div>
+        {% endif %}
+        <div><i class="bi bi-envelope"></i><span class="ms-2">{{order.address.email}}</span></div>
+    </div><hr class="d-md-none my-2">
+
+    <div class="col-12 col-md-6">
+        <div class="row">
+            <div class="col-6 text-start">Amount</div>
+            <div class="col-6 text-end">{{currency}} {{order.amount|floatformat:"0"}}</div>
+        
+            <div class="col-6 text-start">Amount Payable</div>
+            <div class="col-6 text-end">{{currency}} {{order.amount_payable|floatformat:"0"}}</div>
+
+            <div class="col-6 text-start">Item Count</div>
+            <div class="col-6 text-end">{{order.count}}</div>
+        
+            <div class="col-6 text-start">Order<i class="bi bi-clock ms-2"></i></div>
+            <div class="col-6 text-end">{{order.placed_at|date:"d-M-y, H:i"}}</div>
+        
+            <div class="col-6 text-start">Status</div>
+            <div class="col-6 text-end">
+                {% if order.status == 'O' %}
+                    OPEN
+                {% elif order.status == 'C' %}
+                    DELIVERED
+                {% elif order.status == 'N' %}
+                    CANCELLED
+                {% elif order.status == 'P' %}
+                    PENDING CANCELLATION
+                {% else %}
+                    FAILED
+                {% endif %}
+            </div>
+        
+            {% if order.status == 'O' %}
+                <div class="col-6 text-start">Delivery<i class="bi bi-clock ms-2"></i></div>
+                <div class="col-6 text-end">
+                    {% if order.preferred_delivery_time %}
+                        {{order.preferred_delivery_time|date:"d-M-y, H:i"}}
+                    {% else %}
+                        {{delivery_time_hours}} (working) Hour{{delivery_time_hours|pluralize}}
+                    {% endif %}
+                </div>
+            {% elif order.status == 'C' %}
+                <div class="col-6 text-start">Delivered<i class="bi bi-clock ms-2"></i></div>
+                <div class="col-6 text-end">{{order.closed_at|date:"d-M-y, H:i"}}</div>
+            {% elif order.status == 'N' %}
+                <div class="col-6 text-start">Cancelled<i class="bi bi-clock ms-2"></i></div>
+                <div class="col-6 text-end">{{order.cancelled_at|date:"d-M-y, H:i"}}</div>
+            {% elif order.status == 'P' %}
+                <div class="col-6 text-start">Cancellation<i class="bi bi-clock ms-2"></i></div>
+                <div class="col-6 text-end">{{order.cancellation.cancelled_at|date:"d-M-y, H:i"}}</div>
+            {% endif %}
+        </div>
+        {% if order.status == 'O' or order.status == 'C' %}
+            {% if order.additional_info %}
+            <span>Note: </span>
+            <p>
+                {{order.additional_info|truncatechars:50}}
+                {% if order.additional_info|length > 50  %}
+                <a class="link-danger-dark" data-bs-toggle="offcanvas" href="#orderAdditionalInfo{{order.id}}" aria-controls="orderAdditionalInfo{{order.id}}">more</a>
+                {% endif %}
+            </p>
+            {% endif %}
+        {% elif order.status == 'N' or order.status == 'P' %}
+            {% if order.cancellation.reason %}
+            <span>Reason for Cancellation: </span>
+            <p>
+                {{order.cancellation.reason|truncatechars:50}}
+                {% if order.cancellation.reason|length > 50  %}
+                <a class="link-danger-dark" data-bs-toggle="offcanvas" href="#orderCancellationReason{{order.id}}" aria-controls="orderCancellationReason{{order.id}}">more</a>
+                {% endif %}
+            </p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="orderAdditionalInfo{{order.id}}" aria-labelledby="orderAdditionalInfoLabel{{order.id}}">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="orderAdditionalInfoLabel{{order.id}}">Additional Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body text-start">{{order.additional_info}}</div>
+</div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="orderCancellationReason{{order.id}}" aria-labelledby="orderCancellationReasonLabel{{order.id}}">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="orderCancellationReasonLabel{{order.id}}">Reason</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body text-start">{{order.cancellation.reason}}</div>
+</div>

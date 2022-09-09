@@ -1,0 +1,93 @@
+<script id="productVariationsHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="productVariationsModalLabel">{{title}}</h5>
+            <button type="button" class="btn-close toDisable" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {{#each variations}}
+            <div class="card mb-3" style="width: 100%;">
+                <div class="row g-0">
+                    <div class="col-lg-4">
+                        <div id="variationsImagesCarousel{{this.id}}" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <img src="{{this.first_image_url}}" class="d-block w-100 img-fluid rounded-start" alt="{{this.first_image_name}}">
+                                </div>
+                                {{#each this.all_images}}
+                                <div class="carousel-item">
+                                    <img src="{{this.image}}" class="d-block w-100 img-fluid rounded-start" alt="{{this.name}}">
+                                </div>
+                                {{/each}}
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#variationsImagesCarousel{{this.id}}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#variationsImagesCarousel{{this.id}}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card-body text-center">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <h5 class="card-title">{{this.currency}} {{this.price}} / {{this.unit}}</h5>
+                                    <a href="{{variation_url}}" class="card-link toDisableAnchorTag">Details</a>
+                                    <p class="card-text">
+                                        {{this.short_info}}
+                                        <a class="link-danger-dark" data-bs-toggle="offcanvas" href="#offcanvasVariationInfo{{this.id}}" role="button" aria-controls="offcanvasVariationInfo{{this.id}}">
+                                            more
+                                        </a>
+                                        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasVariationInfo{{this.id}}" aria-labelledby="offcanvasVariationInfo{{this.id}}Label">
+                                            <div class="offcanvas-header">
+                                                <h5 class="offcanvas-title" id="offcanvasVariationInfo{{this.id}}Label">{{this.title}}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                            </div>
+                                            <div class="offcanvas-body text-start">{{this.info}}</div>
+                                        </div>
+                                    </p>
+                                </div>
+                                <div class="col-lg-6">
+                                    {{#if keyvalues}}
+                                    <table class="table table-sm mt-0 pt-0">
+                                        <tbody>
+                                            {{#each keyvalues}}
+                                            <tr>
+                                                <td class="p-1 m-1 text-center" style="width: 35%;">{{this.key}}</td>
+                                                <td class="p-1 m-1 text-center" style="width: 65%;">{{this.value}}</td>
+                                            </tr>
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
+                                    {{/if}}
+                                    <form onsubmit="add2cart(event, '{{this.id}}');">
+                                        <label class="visually-hidden" for="variationQtyFormInput{{this.id}}">Qty</label>
+                                        <div class="input-group input-group-sm">
+                                            <div class="input-group-text">{{this.unit}}</div>
+                                            <input type="text" class="form-control toDisable" id="variationQtyFormInput{{this.id}}" placeholder="Qty">
+                                            <div class="input-group-text"><i class="bi bi-cart-check" id="cartCheckIcon{{this.id}}"></i></div>
+                                            <button type="submit" class="btn btn-outline-dark btn-sm toDisable" id="add2cartBtn{{this.id}}">
+                                                <div class="spinner-border spinner-border-sm text-dark" id="add2cartSpinner{{this.id}}" hidden role="status"></div>
+                                                Add
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div class="errormessage" id="add2cartError{{this.id}}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-dark btn-sm toDisable" id="variationModalCloseBtn" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+    {% endverbatim %}
+</script>

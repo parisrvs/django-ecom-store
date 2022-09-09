@@ -1,0 +1,31 @@
+<div class="container-fluid mx-auto my-3">
+    {% if page_obj.has_previous %}
+        {% if search and q %}
+        <a role="button" type="button" href="?q={{q}}&page=1" class="btn btn-sm btn-outline-dark" style="width: 50px;">First</a>
+        <a role="button" type="button" href="?q={{q}}&page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        {% else %}
+        <a role="button" type="button" href="?page=1" class="btn btn-sm btn-outline-dark" style="width: 50px;">First</a>
+        <a role="button" type="button" href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        {% endif %}
+    {% endif %}
+    <a role="button" type="button" class="btn btn-sm btn-outline-dark" onclick="do_nothing(event);" id="pagination_do_nothing">
+        {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </a>
+    {% if page_obj.has_next %}
+        {% if search and q %}
+        <a role="button" type="button" href="?q={{q}}&page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-chevron-double-right"></i>
+        </a>
+        <a role="button" type="button" href="?q={{q}}&page={{ page_obj.paginator.num_pages }}" class="btn btn-sm btn-outline-dark" style="width: 50px;">Last</a>
+        {% else %}
+        <a role="button" type="button" href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-chevron-double-right"></i>
+        </a>
+        <a role="button" type="button" href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-sm btn-outline-dark" style="width: 50px;">Last</a>
+        {% endif %}
+    {% endif %}
+</div>

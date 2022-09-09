@@ -1,0 +1,23 @@
+{% extends 'store/layout/layout.html' %}
+{% load static %}
+
+
+{% block title %}Checkout{% endblock %}
+{% block style %}{% endblock %}
+
+{% block body %}
+<div class="container text-center mt-2 mb-3" id="checkoutMainPage">
+    <h2 class="mb-0">Checkout</h2>
+    <small class="text-muted">Confirm Order</small><hr class="mt-0">
+    <div class="row">
+        <div class="col-lg-6" id="checkoutDevileryAddressDiv"></div>
+        <div class="col-lg-6" id="confirmCheckoutDiv"></div>
+    </div>
+</div>
+{% include 'store/modals/checkout.html' %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'store/js/checkout.js' %}"></script>
+{% include 'store/handlebars/checkout.html' %}
+{% endblock %}

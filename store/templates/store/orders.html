@@ -1,0 +1,52 @@
+{% extends 'store/layout/layout.html' %}
+{% load static %}
+{% load tz %}
+
+{% block title %}Orders{% endblock %}
+{% block style %}{% endblock %}
+
+{% block body %}
+{% localtime on %}
+<div class="container text-center">
+    <h4>Orders</h4><hr class="p-0 m-0">
+    <div class="accordion accordion-flush" id="accordionAllOrders">
+        {% for order in orders|slice:":1" %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{order.id}}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{order.id}}" aria-expanded="false" aria-controls="collapse{{order.id}}">
+                    <span class="me-auto">Order ID: {{order.id}}</span>
+                    <span class="ms-auto">{{order.count}} Item{{ order.count|pluralize }}</span>
+                </button>
+            </h2>
+            <div id="collapse{{order.id}}" class="accordion-collapse collapse show" aria-labelledby="heading{{order.id}}" data-bs-parent="#accordionAllOrders">
+                <div class="accordion-body">
+                    {% include 'store/includes/orders.html' with order=order %}
+                    <a href="{% url 'store:order' order_id=order.id %}" class="link-danger-dark">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% for order in orders|slice:"1:" %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{order.id}}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{order.id}}" aria-expanded="false" aria-controls="collapse{{order.id}}">
+                    <span class="me-auto">Order ID: {{order.id}}</span>
+                    <span class="ms-auto">{{order.count}} Item{{ order.count|pluralize }}</span>
+                </button>
+            </h2>
+            <div id="collapse{{order.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{order.id}}" data-bs-parent="#accordionAllOrders">
+                <div class="accordion-body">
+                    {% include 'store/includes/orders.html' with order=order %}
+                    <a href="{% url 'store:order' order_id=order.id %}" class="link-danger-dark">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% include 'store/pagination.html' with page_obj=orders %}</div>
+</div>
+{% endlocaltime %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}

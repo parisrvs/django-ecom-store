@@ -1,0 +1,216 @@
+<script id="checkoutItemsHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="row text-center">
+        <div class="col-6 text-start">
+            <h5>Total Amount</h5>
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} {{total}}</h5>
+        </div>
+    </div>
+    <div id="checkoutDiscountInfoDiv"></div>
+    <hr class="mt-0 mb-1">
+    <h5><span>{{items_count}}</span> Cart Item(s)</h5>
+    <ol class="list-unstyled">
+        {{#each cart}}
+        <li class="text-start">
+            <h6 class="text-start lead strong pb-0 mb-0"><a href="{{this.variation_url}}" class="link-danger-dark">{{this.title}}</a></h6>
+            <div class="table-responsive text-start">
+                <table class="table table-sm table-borderless align-middle caption-top pb-0 mb-0">
+                    <caption class="p-0 m-0">Product Details</caption>
+                    <tbody>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Unit Price</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.price}} / {{this.unit}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Qty</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.qty}} {{this.unit}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Amount</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.amount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive text-start">
+                <table class="table table-sm table-borderless align-middle caption-top">
+                    {{#if this.keyvalues}}
+                    <caption class="p-0 m-0">Product Variation</caption>
+                    <tbody>
+                        {{#each this.keyvalues}}
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">{{this.key}}</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.value}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                    {{/if}}
+                </table>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+    {% endverbatim %}
+</script>
+
+
+<script id="checkoutDicountInfoHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="row">
+        <div class="col-6 text-start">
+            Discount ({{percent}}%)
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} {{discounted_amount}}</h5>
+        </div>
+        <div class="col-6 text-start">
+            <h5>Amt. Payable</h5>
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} {{amount_payable}}</h5>
+        </div>
+    </div>
+    {% endverbatim %}
+</script>
+
+<script id="checkoutDeliveryAddressFormHandlebars" type="text/x-handlebars-template">
+    <h6>Add Address / <a class="link-danger-dark toDisableAnchorTag" onclick="selectSavedAddress(event);" href="">Select a Saved Address</a></h6>
+    <form class="row g-2" onsubmit="addNewDeliveryAddress(event);">
+        <div class="col-md-6">
+            <label for="checkoutFormInputFirstName" class="form-label"><span class="requirement">*</span>First Name</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputFirstName" placeholder="First Name" autofocus>
+        </div>
+        <div class="col-md-6">
+            <label for="checkoutFormInputLastName" class="form-label"><span class="requirement">*</span>Last Name</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLastName" placeholder="Last Name">
+        </div>
+    
+        <div class="col-md-6">
+            <label for="checkoutFormInputMobile" class="form-label"><span class="requirement">*</span>Mobile Number</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputMobile" placeholder="Mobile Number">
+        </div>
+        <div class="col-md-6">
+            <label for="checkoutFormInputLandline" class="form-label">Home Phone #</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLandline" placeholder="Landline Number">
+        </div>
+    
+        <div class="col-md-12">
+            <label for="checkoutFormInputAddress1" class="form-label"><span class="requirement">*</span>Address Line 1</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputAddress1" placeholder="Address Line 1">
+        </div>
+        <div class="col-md-12">
+            <label for="checkoutFormInputAddress2" class="form-label">Address Line 2</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputAddress2" placeholder="Address Line 2">
+        </div>
+    
+        <div class="col-md-6">
+            <label for="checkoutFormInputCity" class="form-label"><span class="requirement">*</span>City</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputCity" placeholder="City">
+        </div>
+        <div class="col-md-6">
+            <label for="checkoutFormInputPincode" class="form-label"><span class="requirement">*</span>Pin / Zip Code</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputPincode" placeholder="Pin / Zip Code">
+        </div>
+    
+        <div class="col-md-6">
+            <label for="checkoutFormInputState" class="form-label"><span class="requirement">*</span>State</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputState" placeholder="State">
+        </div>
+        <div class="col-md-6">
+            <label for="checkoutFormInputCountry" class="form-label"><span class="requirement">*</span>Country</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputCountry" placeholder="Country">
+        </div>
+    
+        <div class="col-md-6">
+            <label for="checkoutFormInputLandmark" class="form-label"><span class="requirement">*</span>Landmark</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLandmark" placeholder="Landmark">
+        </div>
+        <div class="col-md-6">
+            <label for="checkoutFormInputEmail" class="form-label"><span class="requirement">*</span>Email</label>
+            <input type="email" class="form-control form-control-sm toDisable" id="checkoutFormInputEmail" placeholder="abc@example.com">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-outline-dark btn-sm mt-2 toDisable">
+                <span class="spinner-border spinner-border-sm text-dark" role="status" aria-hidden="true" hidden id="addNewAddressFormSpinner"></span>
+                Continue
+            </button>
+        </div>
+    </form>
+    <div class="errormessage my-2" id="addNewDeliveryAddressError"></div>
+</script>
+
+<script id="checkoutSelectDeliveryAddressHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+        <div class="row row-cols-1 row-cols-lg-2 g-4 text-start">
+            {{#each address}}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-envelope me-2"></i>{{this.email}}</h6>
+                        <p class="card-text">
+                            <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
+                            <div>
+                                <i class="bi bi-telephone me-2"></i>
+                                {{#if this.homephone}}{{this.homephone}}{{else}}<span class="ms-5">-</span>{{/if}}
+                            </div>
+                            <div><i class="bi bi-mailbox"></i><span class="ms-2">Delivery Address</span></i></div>
+                            <div class="ms-4">{{this.address1}}</div>
+                            <div class="ms-4">{{#if this.address2}}{{this.address2}}{{else}}<br>{{/if}}</div>
+                            <div class="ms-4">{{this.pincode}}, {{this.city}}</div>
+                            <div class="ms-4">{{this.state}}, {{this.country}}</div>
+                            <div class="ms-4">{{this.landmark}}</div>
+                        </p>
+                        <a href="" onclick="selectThisDeliveryAddress(event, '{{this.id}}')" class="card-link link-danger-dark toDisableAnchorTag">Select this delivery address.</a>
+                        <span class="spinner-grow text-primary spinner-grow-sm" role="status" hidden id="selectThisDeliveryAddressAnchorTagSpinner{{this.id}}"></span>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    {% endverbatim %}
+</script>
+
+<script id="checkoutSelectedDeliveryAddressHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <h6>
+        <a href="" class="link-danger-dark toDisableAnchorTag" onclick="removeSelectedDeliveryAddress(event, '{{this.id}}')">Remove Address</a>
+        <span class="spinner-grow text-primary spinner-grow-sm" role="status" hidden id="removeSelectedDeliveryAddressAnchorTagSpinner{{this.id}}"></span>
+        /
+        <a class="link-danger-dark toDisableAnchorTag" onclick="selectSavedAddress(event);" href="">Select a Different Address</a>
+    </h6>
+    <div class="card text-start">
+        <div class="card-body">
+            <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-envelope me-2"></i>{{this.email}}</h6>
+            <p class="card-text">
+                <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
+                <div>
+                    <i class="bi bi-telephone me-2"></i>
+                    {{#if this.homephone}}{{this.homephone}}{{else}}<span class="ms-5">-</span>{{/if}}
+                </div>
+                <div><i class="bi bi-mailbox"></i><span class="ms-2">Delivery Address</span></i></div>
+                <div class="ms-4">{{this.address1}}</div>
+                <div class="ms-4">{{#if this.address2}}{{this.address2}}{{else}}<br>{{/if}}</div>
+                <div class="ms-4">{{this.pincode}}, {{this.city}}</div>
+                <div class="ms-4">{{this.state}}, {{this.country}}</div>
+                <div class="ms-4">{{this.landmark}}</div>
+            </p>
+        </div>
+    </div>
+    <div class="table-responsive text-start my-3" id="paymentDiv">
+        <table class="table table-sm table-borderless align-middle caption-top">
+            <caption class="p-0 m-0">Make Payment</caption>
+            <tbody>
+                <tr>
+                    <td style="width: 50%;" class="m-0 p-0">Payment Method</td>
+                    <td style="width: 50%;" class="m-0 p-0">Cash On Delivery</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-outline-dark btn-sm w-100" data-bs-toggle="modal" data-bs-target="#placeOrderConfirmationModal">Place Order</button>
+    </div>
+    {% endverbatim %}
+</script>

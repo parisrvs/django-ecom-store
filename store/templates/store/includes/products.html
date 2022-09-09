@@ -1,0 +1,51 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card h-100 bg-white text-dark border-dark">
+            <div class="card-header bg-dark text-white">
+                <span class="badge bg-white text-dark w-100 fs-6">{{currency}} {{product.variations.first.price}}</span>
+            </div>
+            <div id="carouselProductImage{{product.id}}" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" data-bs-interval="3000">
+                        <img src="{{ product.images.first.image.url }}" class="d-block w-100 card-img-top" alt="{{product.images.first.name}}">
+                    </div>
+                    {% for image in product.images.all|slice:"1:" %}
+                    <div class="carousel-item" data-bs-interval="3000">
+                        <img src="{{image.image.url}}" class="d-block w-100 card-img-top" alt="{{image.image.name}}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProductImage{{product.id}}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselProductImage{{product.id}}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title" style="height: 40px;">{{product.title|lower|title}}</h5>
+                <p class="card-text">
+                    {{product.info|truncatewords_html:30}}
+                    <a class="link-danger-dark" data-bs-toggle="offcanvas" href="#offcanvasProductInfo{{product.id}}" role="button" aria-controls="offcanvasProductInfo{{product.id}}">
+                        more
+                    </a>
+                    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasProductInfo{{product.id}}" aria-labelledby="offcanvasProductInfo{{product.id}}Label">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="offcanvasProductInfo{{product.id}}Label">{{product.title}}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body text-start">{{product.info}}</div>
+                    </div>
+                </p>
+            </div>
+            <div class="card-footer bg-dark text-white btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-white w-50" id="add_variation_btn_{{product.id}}" onclick="get_variations('{{product.id}}');">Add</button>
+                <a role="button" type="button" class="btn btn-sm btn-outline-white w-50" href="{% url 'store:product' product_slug=product.slug %}">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

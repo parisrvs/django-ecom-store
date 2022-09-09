@@ -1,0 +1,100 @@
+<script id="cartOffcanvasHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="row text-center">
+        <div class="col-6 text-start">
+            <h5>Total Amount</h5>
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} <span id="cartTotalAmount">{{total}}</span></h5>
+        </div>
+    </div>
+    <div id="cartOffcanvasDiscount" class="text-center"></div>
+    <a class="w-100 btn btn-sm btn-outline-dark my-2 toDisableAnchorTag" type="button" role="button" href="{{checkout_url}}">Checkout</a>
+    <ol class="list-unstyled">
+        {{#each cart}}
+        <li id="cartItemList{{this.id}}">
+            <h5 class="pb-0 mb-0">
+                <a href="{{variation_url}}" class="link-danger-dark">{{this.title}}</a>
+                <a href="" class="toDisableAnchorTag" style="text-decoration: none;" onclick="removeFromCart(event, '{{this.id}}')">
+                    <i class="bi bi-x-circle text-danger"></i>
+                </a>
+            </h5>
+            <div class="table-responsive text-start">
+                <table class="table table-sm table-borderless align-middle caption-top pb-0 mb-0">
+                    <caption class="p-0 m-0">Product Details</caption>
+                    <tbody>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Unit Price</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.price}} / {{this.unit}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Qty</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.qty}} {{this.unit}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">Amount</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.amount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive text-start">
+                <table class="table table-sm table-borderless align-middle caption-top">
+                    {{#if this.keyvalues}}
+                    <caption class="p-0 m-0">Product Variation</caption>
+                    <tbody>
+                        {{#each this.keyvalues}}
+                        <tr>
+                            <td style="width: 35%;" class="m-0 p-0">{{this.key}}</td>
+                            <td style="width: 65%;" class="m-0 p-0">{{this.value}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                    {{/if}}
+                </table>
+            </div>
+        </li>
+        {{/each}}
+    </ol>
+    <a class="toDisableAnchorTag link-danger-dark" href="" onclick="clearCart(event);">Clear Cart</a>
+    {% endverbatim %}
+</script>
+
+
+<script id="cartOffcanvasDicountFormHandlebars" type="text/x-handlebars-template">
+    <form class="row g-2 align-items-center" onsubmit="applyDiscount(event);">
+        <div class="col-8 me-auto">
+            <label class="visually-hidden" for="cartDiscountFormInput">Code</label>
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control toDisable" id="cartDiscountFormInput" placeholder="Dicsount Code">
+            </div>
+        </div>
+        <div class="col-4 ms-auto">
+            <button type="submit" class="btn btn-outline-dark btn-sm w-100 toDisable" id="cartDiscountFormSubmitBtn">
+                <div class="spinner-border spinner-border-sm text-dark" id="applyDiscountSpinner" hidden role="status"></div>
+                Apply
+            </button>
+        </div>
+    </form>
+    <div class="errormessage" id="cartDiscountError"><br></div>
+</script>
+
+
+<script id="cartOffcanvasDicountInfoHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="row">
+        <div class="col-6 text-start">
+            Discount ({{percent}}%)
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} {{discounted_amount}}</h5>
+        </div>
+        <div class="col-6 text-start">
+            <h5>Amt. Payable</h5>
+        </div>
+        <div class="col-6 text-end">
+            <h5>{{currency}} {{amount_payable}}</h5>
+        </div>
+    </div>
+    {% endverbatim %}
+</script>

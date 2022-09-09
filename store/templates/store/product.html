@@ -1,0 +1,87 @@
+{% extends 'store/layout/layout.html' %}
+{% load static %}
+
+
+{% block title %}{{product.title|lower|title}}{% endblock %}
+{% block style %}{% endblock %}
+
+{% block body %}
+<div class="container text-center my-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a class="link-danger-dark" href="{% url 'store:homepage' %}">All Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{product.title|lower|title}}</li>
+        </ol>
+    </nav>
+    <div class="card mb-3" style="width: 100%;">
+        <div class="card-header text-dark"><h4>{{product.title|lower|title}}</h4></div>
+        <div class="row g-1">
+            <div class="col-md-6">
+                <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in product.images.all|slice:":1" %}
+                        <div class="carousel-item active">
+                            <img src="{{image.image.url}}" class="d-block w-100 img-fluid rounded-start" alt="{{image.image.name}}">
+                        </div>
+                        {% endfor %}
+                        {% for image in product.images.all|slice:"1:" %}
+                        <div class="carousel-item">
+                            <img src="{{image.image.url}}" class="d-block w-100 img-fluid rounded-start" alt="{{image.image.name}}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <p class="card-text">
+                        <div id="productVariationCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for variation in product.variations.all|slice:":1" %}
+                                    <div class="carousel-item active">
+                                        {% include 'store/includes/product_variation.html' with variation=variation product_slug=product.slug %}
+                                    </div>
+                                {% endfor %}
+                                {% for variation in product.variations.all|slice:"1:" %}
+                                    <div class="carousel-item">
+                                        {% include 'store/includes/product_variation.html' with variation=variation product_slug=product.slug %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if product.variations.all|length > 1 %}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productVariationCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productVariationCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </p>
+                    <p class="card-text"><small class="text-muted">
+                        {% for category in product.categories.all %}
+                            <span><a class="link-danger-dark toDisableAnchorTag" href="{% url 'store:products_by_category' category_slug=category.slug %}">{{category}}</a>&nbsp;</span>
+                        {% endfor %}
+                    </small></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-start bg-white text-dark">{{product.info}}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'store/js/product.js' %}"></script>
+<script src="{% static 'store/js/homepage.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,31 @@
+<table class="table table-sm">
+    <tbody>
+        {% for kv in variation.keyvalues.all %}
+        <tr>
+            <td class="text-center m-1 p-1" style="width: 35%;">{{kv.key.key}}</td>
+            <td class="text-center p-1 m-1" style="width: 65%;">{{kv.value.value}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div>{{currency}} {{variation.price}} / {{variation.unit}}</div>
+<a href="{% url 'store:variation' product_slug=product.slug variation_id=variation.id %}" class="card-link toDisableAnchorTag">
+    Details
+</a>
+<div id="add2cartForm" class="mb-0 mt-2">
+    <form class="row g-1 align-items-center" onsubmit="add2cart(event, '{{variation.id}}');">
+        <div class="col-12">
+            <label class="visually-hidden" for="variationQtyFormInput{{variation.id}}">Qty</label>
+            <div class="input-group input-group-sm">
+                <div class="input-group-text">{{variation.unit}}</div>
+                <input type="text" class="form-control toDisable" id="variationQtyFormInput{{variation.id}}" placeholder="Qty">
+                <div class="input-group-text"><i class="bi bi-cart-check" id="cartCheckIcon{{variation.id}}"></i></div>
+                <button type="submit" class="btn btn-outline-dark btn-sm toDisable" id="add2cartBtn{{variation.id}}">
+                    <div class="spinner-border spinner-border-sm text-dark" id="add2cartSpinner{{variation.id}}" hidden role="status"></div>
+                    Add
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="errormessage" id="add2cartError{{variation.id}}"></div>
+</div>

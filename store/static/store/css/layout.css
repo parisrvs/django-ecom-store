@@ -1,0 +1,74 @@
+body {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  margin-top: 75px;
+  padding: 5px;
+}
+
+.errormessage, .requirement {
+  color: #dc3545;
+}
+
+#navbarSupportedContent > ul > li > a {
+  color: #212529;
+  text-decoration: none;
+}
+#navbarSupportedContent > ul > li > a:hover {
+  color: #212529;
+  text-decoration: underline;
+}
+
+.dropdown > .dropdown-menu > li > .dropdown-item {
+  color: #212529;
+  text-decoration: none;
+  background-color: #fff;
+}
+.dropdown > .dropdown-menu > li > .dropdown-item:hover {
+  color: #fff;
+  background-color: #212529;
+  text-decoration: underline;
+}
+
+.dropdown-menu {
+  border-color: #212529;
+}
+
+.success {
+  color: #198754;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.btn-outline-dark {
+  color: #fff;
+  background-color: #212529;
+  border-color: #212529;
+}
+.btn-outline-dark:hover {
+  color: #212529;
+  background-color: #fff;
+  border-color: #212529;
+}
+
+.btn-outline-white {
+  color: #212529;
+  background-color: #fff;
+  border-color: #fff;
+}
+.btn-outline-white:hover {
+  color: #fff;
+  background-color: #212529;
+  border-color: #fff;
+}
+
+.link-danger-dark {
+  color: #66121a;
+  text-decoration: none;
+}
+.link-danger-dark:hover {
+  color: #212529;
+  text-decoration: underline;
+}
+
+/*# sourceMappingURL=layout.css.map */
