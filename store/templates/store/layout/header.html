@@ -30,19 +30,36 @@
                         {% endfor %}
                     </ul>
                 </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'store:homepage' %}">Homepage</a>
+                </li>
                 {% endif %}
                 {% if request.user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{request.user.first_name}}
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'authentication:account' %}">Account</a></li>
-                        <li><a class="dropdown-item" href="{% url 'store:orders' %}">Orders</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{request.user.first_name}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'authentication:account' %}">Account</a></li>
+                            {% if not request.user.is_superuser %}<li><a class="dropdown-item" href="{% url 'store:orders' %}">Orders</a></li>{% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% if request.user.is_superuser %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Database
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'store:clear_database_but_images' %}">Clear</a></li>
+                            <li><a class="dropdown-item" href="{% url 'store:clear_database_images' %}">Clear Images</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'store:database_update' %}">Update</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'authentication:homepage' %}">Login</a>

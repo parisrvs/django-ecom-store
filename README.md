@@ -39,8 +39,13 @@ Instructions
         CURRENCY = 'Rs.'
         # Integer value
         DELIVERY_TIME_IN_HOURS = 24
-        # Integer greater than or equal to 1
+        # Integer greater than or equal to 1, must correspond with DELIVERY_TIME_IN_HOURS
         DELIVERY_TIME_IN_DAYS = 1
+
+        'context_processors': [
+                ...
+                'store.context_processors.site_defaults',
+        ],
 
 ### 07. Tp redirect users to "store" homepage use any of the following -
         - <a href="{% url 'store:homepage' %}">Store</a>
@@ -53,4 +58,12 @@ Instructions
 
 ### 09. When a user closes their account, the app will not delete the User account but set `is_active` to `False` in [User Model](https://docs.djangoproject.com/en/4.1/ref/contrib/auth/#django.contrib.auth.models.User.is_active)
 
-### 10. Check [Demo Website](https://django-user-login.herokuapp.com/)
+### 10. Layout template refers to `favicon.ico` in `static` folder in the root directory.
+
+        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
+### 11. Product images are stored in `BASE_DIR/static/images/product-images`
+
+        upload_to="static/images/product-images/"
+
+### 12. Check [Demo Website](https://django-ecom-store.herokuapp.com/) and [Github](https://github.com/parisrvs/django-store) code for more information.

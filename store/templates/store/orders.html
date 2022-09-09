@@ -8,6 +8,7 @@
 {% block body %}
 {% localtime on %}
 <div class="container text-center">
+    {% if orders %}
     <h4>Orders</h4><hr class="p-0 m-0">
     <div class="accordion accordion-flush" id="accordionAllOrders">
         {% for order in orders|slice:":1" %}
@@ -44,6 +45,14 @@
         {% endfor %}
     </div>
     {% include 'store/pagination.html' with page_obj=orders %}</div>
+    {% else %}
+    <span class="position-fixed top-50 start-50 translate-middle badge bg-dark text-white fs-4 rounded-pill">
+        Orders
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            0
+        </span>
+    </span>
+    {% endif %}
 </div>
 {% endlocaltime %}
 {% endblock %}

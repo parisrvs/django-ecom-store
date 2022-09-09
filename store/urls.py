@@ -4,10 +4,13 @@ from . import views
 app_name = "store"
 
 urlpatterns = [
+    path("database/", views.database_update, name="database_update"),
+    path("database/clear/", views.clear_database_but_images, name="clear_database_but_images"),
+    path("database/clear/images/", views.clear_database_images, name="clear_database_images"),
+
     path('', views.homepage, name="homepage"),
     path('search/', views.search, name="search"),
     path("apply-discount/", views.apply_discount),
-    path("database/", views.database_update, name="database_update"),
     path("products/get-variations/", views.get_variations, name="get_variations"),
     path("products/add-to-cart/", views.add2cart, name="add2cart"),
     path("products/<slug:product_slug>/", views.product, name="product"),

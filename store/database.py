@@ -1,5 +1,5 @@
 from decimal import Decimal
-from .models import Key, KeyValue, Product, Variation, Image, Tag, Category, Value, Discount
+from .models import Key, KeyValue, Order, OrderCancellation, OrderItem, Product, Variation, Image, Tag, Category, Value, Discount
 import random
 from django.utils.text import slugify
 
@@ -390,7 +390,10 @@ def UPDATE_VARIATIONS():
     return
 
 
-def clear_all():
+def clear_all_but_images():
+    oc = OrderCancellation.objects.all().delete()
+    odi = OrderItem.objects.all().delete()
+    o = Order.objects.all().delete()
     d = Discount.objects.all().delete()
     v = Variation.objects.all().delete()
     kv = KeyValue.objects.all().delete()
@@ -399,7 +402,10 @@ def clear_all():
     p = Product.objects.all().delete()
     c = Category.objects.all().delete()
     t = Tag.objects.all().delete()
-    # i = Image.objects.all().delete()
+
+
+def clear_images():
+    i = Image.objects.all().delete()
 
 
 def inventory():

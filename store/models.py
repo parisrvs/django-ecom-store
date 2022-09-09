@@ -5,7 +5,7 @@ from authentication.models import Person, Address
 
 
 class Image(models.Model):
-    image = models.ImageField(max_length=1000, unique=True, null=False, upload_to="product-images/")
+    image = models.ImageField(max_length=1000, unique=True, null=False, upload_to="static/images/product-images/")
     name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):

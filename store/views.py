@@ -738,13 +738,28 @@ def search(request):
     )
 
 
+@login_required
 def database_update(request):
-    # database.UPLOAD_CATEGORIES()
-    # database.UPLOAD_PRODUCTS()
-    # database.UPLOAD_TAGS()
-    # database.UPDATE_PROUCTS()
-    # database.UPDATE_KEYVALUE()
-    # database.UPDATE_VARIATIONS()
-    # database.inventory()
-    # database.clear_all()
+    if request.user.is_superuser:
+        database.UPLOAD_CATEGORIES()
+        database.UPLOAD_PRODUCTS()
+        database.UPLOAD_TAGS()
+        database.UPDATE_PROUCTS()
+        database.UPDATE_KEYVALUE()
+        database.UPDATE_VARIATIONS()
+        database.inventory()
+    return HttpResponseRedirect(reverse("store:homepage"))
+
+
+@login_required
+def clear_database_but_images(request):
+    if request.user.is_superuser:
+        database.clear_all_but_images()
+    return HttpResponseRedirect(reverse("store:homepage"))
+
+
+@login_required
+def clear_database_images(request):
+    if request.user.is_superuser:
+        database.clear_images()
     return HttpResponseRedirect(reverse("store:homepage"))
