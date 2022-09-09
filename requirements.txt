@@ -1,1 +1,2 @@
 django
+django-user-login==0.3.2
