@@ -1,0 +1,56 @@
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
+    <div class="offcanvas-header bg-dark text-white">
+        <h5 class="offcanvas-title" id="filterOffcanvasLabel">Filter</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" action="{% url 'store:homepage' %}">
+            <div class="mb-3">
+                <select class="form-select form-select-sm toDisable" name="category" onchange="categorySelected();" id="filterCategoryListOffcanvas">
+                    {% if selected_category %}
+                        <option selected value="{{selected_category.slug}}">{{selected_category.title|lower|title}}</option>
+                    {% else %}
+                        <option disabled selected value="">Category</option>
+                    {% endif %}
+                    {% for category in categories %}
+                        <option value="{{category.slug}}">{{category.title|lower|title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <select class="form-select form-select-sm toDisable" name="product" id="filterProductListOffcanvas">
+                    {% if selected_product %}
+                        <option selected value="{{selected_product.slug}}">{{selected_product.title|lower|title}}</option>
+                    {% else %}
+                        <option disabled selected value="">Product</option>
+                    {% endif %}
+                    {% for product in products_set %}
+                        <option value="{{product.slug}}">{{product.title|lower|title}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <select class="form-select form-select-sm toDisable" name="sort" id="filterSortItemsOffcanvas" value="{{selected_sort}}">
+                    {% if selected_sort %}
+                        <option selected value="{{selected_sort.value}}">{{selected_sort.display}}</option>
+                    {% else %}
+                        <option disabled selected value="">Sort</option>
+                    {% endif %}
+                    <option value="a-z">A - Z</option>
+                    <option value="z-a">Z - A</option>
+                    <option value="price-asc">Price (Low to High)</option>
+                    <option value="price-desc">Price (High to Low)</option>
+                </select>
+            </div>
+            <div class="btn-group w-100" role="group">
+                <a type="button" role="button" class="btn btn-sm btn-outline-dark w-25 toDisableAnchorTag" href="{% url 'store:homepage' %}">
+                    Clear
+                </a>
+                <button type="submit" class="btn btn-sm btn-outline-dark w-25 toDisable">
+                    <div class="spinner-border spinner-border-sm toHide" hidden role="status"></div>
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

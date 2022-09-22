@@ -2,27 +2,43 @@
 {% load static %}
 
 
-{% block title %}Search{% endblock %}
+{% block title %}Products{% endblock %}
 {% block style %}{% endblock %}
 
+
 {% block body %}
-<div class="container text-center mt-2 mb-2">
+<div class="container-fluid text-center px-4">
     {% if products %}
-    {% include 'store/includes/products.html' with products=products search=search q=q %}
-    <div>{% include 'store/pagination.html' with page_obj=products %}</div>
+        <form  method="get" action="{% url 'store:search' %}">
+            <input name="q" hidden value="{{search_query}}">
+            <div class="input-group input-group-sm mb-3">
+                <a role="button" type="button" class="btn btn-outline-dark" type="button" href="{% url 'store:search' %}?q={{search_query}}">Clear</a>
+                <select class="form-select form-select-sm toDisable" name="sort" id="filterSortItemsOffcanvas" value="{{search_filter_query}}">
+                    {% if search_filter_query %}
+                        <option selected value="{{search_filter_query.value}}">{{search_filter_query.display}}</option>
+                    {% else %}
+                        <option disabled selected value="">Sort</option>
+                    {% endif %}
+                    <option value="a-z">A - Z</option>
+                    <option value="z-a">Z - A</option>
+                    <option value="price-asc">Price (Low to High)</option>
+                    <option value="price-desc">Price (High to Low)</option>
+                </select>
+                <button class="btn btn-outline-dark" type="submit">Filter</button>
+            </div>
+        </form>
+        {% include "store/includes/products.html" with products=products %}
+        {% include "store/includes/pagination.html" with page_obj=products search_query=search_query %}
     {% else %}
-    <span class="position-fixed top-50 start-50 translate-middle badge bg-dark text-white fs-4 rounded-pill">
-        Results
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            0
+        <span class="badge position-fixed start-50 top-50 translate-middle rounded-pill bg-dark text-white fs-5">
+            Results
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
         </span>
-    </span>
     {% endif %}
 </div>
-{% include 'store/modals/homepage.html' %}
 {% endblock %}
+
 
 {% block script %}
 <script src="{% static 'store/js/homepage.js' %}"></script>
-{% include 'store/handlebars/homepage.html' %}
 {% endblock %}

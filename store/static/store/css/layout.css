@@ -1,43 +1,38 @@
 body {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  margin-top: 75px;
-  padding: 5px;
+  margin-top: 65px;
 }
 
-.errormessage, .requirement {
-  color: #dc3545;
-}
-
-#navbarSupportedContent > ul > li > a {
+#storeNavbar ul li a {
   color: #212529;
   text-decoration: none;
 }
-#navbarSupportedContent > ul > li > a:hover {
+#storeNavbar ul li a:hover {
   color: #212529;
   text-decoration: underline;
 }
-
-.dropdown > .dropdown-menu > li > .dropdown-item {
+#storeNavbar ul li ul li a {
   color: #212529;
-  text-decoration: none;
   background-color: #fff;
+  text-decoration: none;
 }
-.dropdown > .dropdown-menu > li > .dropdown-item:hover {
+#storeNavbar ul li ul li a:hover {
   color: #fff;
   background-color: #212529;
   text-decoration: underline;
 }
 
-.dropdown-menu {
-  border-color: #212529;
+.errormessage, .requirement, .error {
+  color: #921925;
 }
 
-.success {
-  color: #198754;
+.productBadge {
+  background-color: #212529;
+  color: #fff;
 }
-
-.error {
-  color: #dc3545;
+.productBadge:hover {
+  background-color: #dc3545;
+  color: #fff;
 }
 
 .btn-outline-dark {
@@ -46,24 +41,13 @@ body {
   border-color: #212529;
 }
 .btn-outline-dark:hover {
-  color: #212529;
-  background-color: #fff;
-  border-color: #212529;
-}
-
-.btn-outline-white {
-  color: #212529;
-  background-color: #fff;
-  border-color: #fff;
-}
-.btn-outline-white:hover {
   color: #fff;
-  background-color: #212529;
-  border-color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
 }
 
 .link-danger-dark {
-  color: #66121a;
+  color: #921925;
   text-decoration: none;
 }
 .link-danger-dark:hover {

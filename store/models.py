@@ -1,12 +1,12 @@
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
-from authentication.models import Person, Address
+from django.contrib.auth.models import User
 
-
+######## Product #########
 class Image(models.Model):
-    image = models.ImageField(max_length=1000, unique=True, null=False, upload_to="static/images/product-images/")
-    name = models.CharField(max_length=255, blank=True, null=True)
+    image = models.ImageField(max_length=1000, unique=True, null=False, upload_to="images/product-images/")
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -40,8 +40,6 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=255, unique=True, null=False)
     slug = models.SlugField(max_length=255, blank=True, null=True)
-    info = models.TextField(max_length=1000, blank=True, null=True)
-    images = models.ManyToManyField(Image, blank=True, related_name="products")
     tags = models.ManyToManyField(Tag, blank=True, related_name="products")
     categories = models.ManyToManyField(Category, related_name="products", blank=True)
 
@@ -84,6 +82,14 @@ class KeyValue(models.Model):
         verbose_name_plural = "Key-Value-Pairs"
 
 
+class Discount(models.Model):
+    code = models.CharField(max_length=10, unique=True)
+    percent = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.code} - {self.percent}%"
+
+
 class Variation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variations")
     price = models.DecimalField(
@@ -99,6 +105,8 @@ class Variation(models.Model):
     images = models.ManyToManyField(Image, blank=True, related_name="variations")
     created = models.DateTimeField(auto_now_add=True)
     inventory = models.IntegerField(default=0)
+    discount = models.ForeignKey(Discount, blank=True, null=True, on_delete=models.PROTECT)
+    delivery_time_in_days = models.IntegerField(default=1)
 
     def __str__(self):
         return f"{self.product.title} | Rs. {self.price}/-"
@@ -106,20 +114,76 @@ class Variation(models.Model):
     class Meta:
         ordering = ["product"]
 
-class Discount(models.Model):
-    code = models.CharField(max_length=10, unique=True)
-    percent = models.IntegerField()
+
+class Pincode(models.Model):
+    pincode = models.CharField(max_length=10, unique=True, blank=False, null=False)
+    # products not available at this location
+    products_unavailable = models.ManyToManyField(Variation, blank=True, related_name="pincodes")
+    delivery_time_in_days = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"{self.code} - {self.percent}%"
+        return self.pincode
 
 
+##### Delivery Address #####
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="address")
+    editable = models.BooleanField(default=True)
+    is_primary = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    email = models.EmailField(max_length=500)
+    mobile = models.CharField(max_length=20)
+    landline = models.CharField(max_length=20, null=True, blank=True)
+    address1 = models.CharField(max_length=2000)
+    address2 = models.CharField(max_length=2000, null=True, blank=True)
+    landmark = models.CharField(max_length=1000)
+    pincode = models.CharField(max_length=20)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    class Meta:
+        ordering = ['first_name', 'last_name']
+        verbose_name_plural = "Address Entries"
+
+
+######### Order ##########
 class Order(models.Model):
     OPEN = 'O'
     CLOSED = 'C'
     CANCELLED = 'N'
     PENDING_CANCELLATION = 'P'
     FAILED = 'F'
+
+    CREDIT_CART = 'CCD'
+    DEBIT_CARD = 'DCD'
+    PAYPAL = 'PPL'
+    OTHER = 'OTH'
+    CASH_ON_DELIVERY = 'COD'
+
+    PAYMENT_PENDING = 'P'
+    PAYMENT_SUCCESSFUL = 'S'
+    PAYMENT_FAILED = 'F'
+    PAYMENT_UNSUCCESSFUL = 'U'
+
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_PENDING, "Pending"),
+        (PAYMENT_SUCCESSFUL, "Successful"),
+        (PAYMENT_FAILED, "Failed"),
+        (PAYMENT_UNSUCCESSFUL, "Unsuccessful"),
+    ]
+
+    PAYMENT_METHOD_CHOICES = [
+        (CREDIT_CART, "Credit Card"),
+        (DEBIT_CARD, "Debit Card"),
+        (PAYPAL, "PayPal"),
+        (OTHER, "Other"),
+        (CASH_ON_DELIVERY, "Cash On Delivery")
+    ]
 
     ORDER_STATUS_CHOICES = [
         (OPEN, "OPEN"),
@@ -129,17 +193,18 @@ class Order(models.Model):
         (FAILED, "FAILED")
     ]
 
-    customer = models.ForeignKey(Person, on_delete=models.PROTECT, related_name="orders")
-    address = models.ForeignKey(Address, on_delete=models.PROTECT)
+    customer = models.ForeignKey(User, on_delete=models.PROTECT, related_name="orders")
+    address = models.ForeignKey(Address, on_delete=models.PROTECT, related_name="orders")
     amount = models.DecimalField(max_digits=20, decimal_places=2, validators=[MinValueValidator(1)])
     discount = models.ForeignKey(Discount, on_delete=models.PROTECT, blank=True, null=True, related_name="orders")
     amount_payable = models.DecimalField(max_digits=20, decimal_places=2, validators=[MinValueValidator(1)])
-    status = models.CharField(max_length=1, choices=ORDER_STATUS_CHOICES, default=OPEN)
+    order_status = models.CharField(max_length=1, choices=ORDER_STATUS_CHOICES, default=OPEN)
+    payment_method = models.CharField(max_length=3, choices=PAYMENT_METHOD_CHOICES, default=CASH_ON_DELIVERY)
+    payment_status = models.CharField(max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_PENDING)
     placed_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(blank=True, null=True)
     cancelled_at = models.DateTimeField(blank=True, null=True)
-    preferred_delivery_time = models.DateTimeField(blank=True, null=True)
-    additional_info = models.CharField(max_length=1000, blank=True, null=True)
+    expected_delivery_time = models.DateTimeField(blank=True, null=True)
     count = models.IntegerField(default=1)
 
     def __str__(self):
@@ -152,9 +217,14 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name="orderitems")
     product = models.ForeignKey(Variation, on_delete=models.PROTECT, related_name="orderitems")
-    quantity = models.DecimalField(max_digits=6, decimal_places=2)
     unit_price = models.DecimalField(max_digits=20, decimal_places=2)
+    quantity = models.DecimalField(max_digits=6, decimal_places=2)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
+    discount_percent = models.IntegerField(blank=True, null=True)
+    amount_payable = models.DecimalField(max_digits=20, decimal_places=2)
+
+    class Meta:
+        ordering = ["-order__placed_at"]
 
 
 class OrderCancellation(models.Model):

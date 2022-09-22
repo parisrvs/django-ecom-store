@@ -5,33 +5,33 @@
 {% block title %}Products{% endblock %}
 {% block style %}{% endblock %}
 
+
 {% block body %}
-<div class="container text-center mt-2 mb-2">
-
-    {% if categories %}
-    <div class="dropdown d-lg-none mb-3">
-        <a class="btn btn-outline-dark btn-sm dropdown-toggle w-50" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Products
-        </a>
-        <ul class="dropdown-menu w-50" style="max-height: 300px; overflow-y: scroll;">
-            <li><a class="dropdown-item" href="{% url 'store:homepage' %}">All</a></li>
-            {% for category in categories %}
-            <li><a class="dropdown-item" href="{% url 'store:products_by_category' category.slug %}">{{category.title}}</a></li>
-            {% endfor %}
-        </ul>
+<div class="container-fluid">
+    <div class="row" style="margin-bottom: 10px;">
+        <div class="col-1 position-relative ps-sm-4 ps-1">
+            <div class="position-fixed">
+                <button class="btn btn-outline-dark btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
+                    <i class="bi bi-funnel"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-11 pe-4">
+            {% if products %}
+                {% include "store/includes/products.html" with products=products %}
+                {% include "store/includes/pagination.html" with page_obj=products filter_query=filter_query %}
+            {% else %}
+                <span class="badge position-fixed start-50 top-50 translate-middle rounded-pill bg-dark text-white fs-5">
+                    Products
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </span>
+            {% endif %}
+        </div>
     </div>
-    {% endif %}
-
-    {% if products %}
-    {% include 'store/includes/products.html' with products=products %}
-    <div>{% include 'store/pagination.html' with page_obj=products %}</div>
-    {% else %}
-    <span class="badge position-fixed top-50 start-50 translate-middle bg-dark text-white fs-4 rounded-pill">Comming Soon...</span>
-    {% endif %}
-
+    {% include "store/includes/product_filter.html" with products=products categories=categories %}
 </div>
-{% include 'store/modals/homepage.html' %}
 {% endblock %}
+
 
 {% block script %}
 <script src="{% static 'store/js/homepage.js' %}"></script>

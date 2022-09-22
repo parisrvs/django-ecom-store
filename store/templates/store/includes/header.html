@@ -1,0 +1,65 @@
+<div class="fixed-top container-fluid">
+    <nav class="navbar navbar-expand-md bg-white">
+        <div class="container-fluid">
+            <a class="nav-link d-md-none position-relative" href="" onclick="displayCart(event);">
+                <i class="bi bi-cart fs-5"></i>
+                <span class="cart_items_count badge rounded-pill text-white bg-danger position-absolute ms-1 top-0 start-100 translate-middle">{{cart_items_Count}}</span>
+            </a>
+            <a class="navbar-brand" href="/" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Homepage">
+                <i class="bi bi-house-door"></i>
+                <span class="badge rounded-pill text-white bg-dark fs-5">{{sitetitle}}</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#storeNavbar" aria-controls="storeNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="storeNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'store:homepage' %}">Products</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link position-relative" href="" onclick="displayCart(event);">
+                            Cart
+                            <span class="position-absolute mt-2 me-2 top-0 start-100 translate-middle cart_items_count badge rounded-pill text-white bg-danger">{{cart_items_Count}}</span>
+                        </a>
+                    </li>
+                    {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{request.user.first_name}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'store:profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'store:orders' %}">Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'authentication:login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex" role="search" onsubmit="search(event);" action="{% url 'store:search' %}" method="get">
+                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search" aria-label="Search" id="navBarSearchInput">
+                    <button class="btn btn-sm btn-outline-dark" type="submit" id="navbarSearchBtn">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</div>

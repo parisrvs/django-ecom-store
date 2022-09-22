@@ -1,81 +1,79 @@
 {% extends 'store/layout/layout.html' %}
 {% load static %}
-{% load tz %}
 
-{% block title %}Orders{% endblock %}
+
+{% block title %}Order #{{order.id}}{% endblock %}
 {% block style %}{% endblock %}
 
+
 {% block body %}
-{% localtime on %}
-<div class="container mb-2">
-    <h4 class="text-center pb-0 mb-0">Order ID - {{order.id}}</h4><hr class="pt-0 mt-0">
-    {% include 'store/includes/orders.html' with order=order %}<hr>
-    <div class="table-responsive">
-        <table class="table text-center">
-            <thead>
-                <tr>
-                    <th>Product(s)</th>
-                    <th>Qty</th>
-                    <th>Amount ({{currency}})</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in order.items %}
-                <tr>
-                    <td style="width: 70%">
-                        <div class="text-start">
-                            <a class="link-danger-dark" href="{% url 'store:variation' product_slug=item.product.product_slug variation_id=item.product.variation_id %}">
-                                {{item.product.product_title}}
-                            </a>
-                        </div>
-                        <div class="text-start">{{currency}} {{item.product.price|floatformat:2}} / {{item.product.unit}}</div>
-                        {% if item.product.keyvalues %}
-                        <table class="table table-sm mb-0 table-borderless text-start">
-                            <tbody>
-                                {% for kv in item.product.keyvalues %}
-                                <tr>
-                                    <td class="my-0 py-0 text-start" style="width: 40%;">{{kv.key}}</td>
-                                    <td class="my-0 py-0 text-start" style="width: 60%;">{{kv.value}}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% endif %}
-                    </td>
-                    <td style="width: 10%">{{item.qty}}</td>
-                    <td style="width: 20%">{{item.amount|floatformat:"0"}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <table class="table text-center">
-            <tbody>
-                <tr>
-                    <td style="width: 80%">Total ({{currency}})</td>
-                    <td style="width: 20%">{{order.amount|floatformat:"0"}}</td>
-                </tr>
-                <tr>
-                    <td style="width: 80%">Discount</td>
-                    <td style="width: 20%">{% if order.discount %}{{order.discount}}%{% else %}-{% endif %}</td>
-                </tr>
-                <tr>
-                    <td style="width: 80%">Amount Payable ({{currency}})</td>
-                    <td style="width: 20%">{{order.amount_payable|floatformat:"0"}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    {% if order.status == 'O' %}
-    <button class="btn btn-sm btn-outline-dark" type="button" role="button" onclick="displayOrderCancellationModal('{{order.id}}');">Cancel Order</button>
-    {% elif order.status == 'P' %}
-    <a role="button" type="button" class="btn btn-sm btn-outline-dark" href="{% url 'store:reopenOrder' order_id=order.id %}">Reopen Order</a>
+<div class="container text-center mb-3">
+    <h5>Order Details</h5><hr>
+    {% if messages %}
+        <ul class="messages list-unstyled text-center">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }} text-success"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
+    <div>{% include 'store/includes/orders.html' with order=order %}</div><hr>
+    <div id="order_items" class="text-start">
+        {% for item in order.orderitems.all %}
+        <div class="row">
+            <div class="col-9 fs-5 text-start">{{item.product.product.title|lower|title}}</div>
+            <div class="col-3 text-end"><span class="badge bg-dark text-white">{% if item.discount_percent %}{{item.discount_percent}}% off{% endif %}</span></div>
+            <div class="col-md-5">
+                {% if item.product.keyvalues.all %}
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless text-center align-middle m-0 p-0">
+                        <tbody>
+                            {% for kv in item.product.keyvalues.all %}
+                            <tr>
+                                <td class="p-0 m-0" style="width: 35%;">{{kv.key}}</td>
+                                <td class="p-0 m-0" style="width: 65%;">{{kv.value}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-7">
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless text-center align-middle">
+                        <thead>
+                            <tr>
+                                <th>Price ({{currency}}/{{item.product.unit}})</th>
+                                <th>Qty ({{item.product.unit}})</th>
+                                <th>Amt. ({{currency}})</th>
+                                <th>Payable ({{currency}})</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{item.product.price}}</td>
+                                <td>{{item.quantity}}</td>
+                                <td>{{item.amount}}</td>
+                                <td>{{item.amount_payable}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+        {% if order.order_status == 'O' %}
+            <a class="link-danger-dark text-start toDisableAnchorTag" href="" onclick="cancelOrder(event, '{{order.id}}');">
+                Cancel Order
+                <div class="spinner-grow spinner-grow-sm" role="status" hidden id="cancelOrderSpinner"></div>
+            </a>
+        {% endif %}
+    </div>
 </div>
-{% endlocaltime %}
-{% include 'store/modals/order.html' %}
 {% endblock %}
 
+
 {% block script %}
-<script src="{% static 'store/js/order.js' %}"></script>
-{% include 'store/handlebars/order.html' %}
+<script src="{% static 'store/js/orders.js' %}"></script>
 {% endblock %}

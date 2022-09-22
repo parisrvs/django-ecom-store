@@ -1,220 +1,215 @@
-document.addEventListener("DOMContentLoaded", () => {
-    load_cart();
+document.addEventListener("DOMContentLoaded", ()=>{
+    load_checkout_page();
 });
 
 
-function load_cart() {
+function load_checkout_page() {
     const request = new XMLHttpRequest();
-    request.open('GET', '/store/cart/');
+    request.open('GET', '/store/get-cart/');
+
     request.onload = () => {
         const res = JSON.parse(request.responseText);
         if (res.success) {
-            const details_template = Handlebars.compile(document.querySelector('#checkoutItemsHandlebars').innerHTML);
-            const details = details_template({"cart": res.cart, "total": res.total, "currency": res.currency, "items_count": res.items_count});
-            document.querySelector("#confirmCheckoutDiv").innerHTML = details;
-
-            if (res.discount) {
-                const discountInfo_template = Handlebars.compile(document.querySelector('#checkoutDicountInfoHandlebars').innerHTML);
-                const discount = discountInfo_template(res.discount);
-                document.querySelector("#checkoutDiscountInfoDiv").innerHTML = discount;
-            }
-
-            if (res.delivery_address) {
-                const address_template = Handlebars.compile(document.querySelector('#checkoutSelectedDeliveryAddressHandlebars').innerHTML);
-                const address = address_template(res.delivery_address);
-                document.querySelector("#checkoutDevileryAddressDiv").innerHTML = address;
+            if (res.cart.delivery_address) {
+                const address_template = Handlebars.compile(document.querySelector('#checkoutPageAddressHandlebars').innerHTML);
+                const address = address_template(res.cart.delivery_address);
+                document.querySelector("#delivery_address").innerHTML = address;
             } else {
-                const address_template = Handlebars.compile(document.querySelector('#checkoutDeliveryAddressFormHandlebars').innerHTML);
+                const address_template = Handlebars.compile(document.querySelector('#checkoutPageAddressFormHandlebars').innerHTML);
                 const address = address_template();
-                document.querySelector("#checkoutDevileryAddressDiv").innerHTML = address;
+                document.querySelector("#delivery_address").innerHTML = address;
+                document.querySelector("#addDeliveryAddressFormInputFirstName").focus();
             }
+            const details_template = Handlebars.compile(document.querySelector('#checkoutPageCartItemsHandlebars').innerHTML);
+            const details = details_template({"cart": res.cart});
+            document.querySelector("#cart_items").innerHTML = details;
         } else {
             location.reload();
         }
     };
+
     request.send();
     return false;
 }
 
 
-function selectSavedAddress(event) {
+
+function addDeliveryAddress(event) {
     event.preventDefault();
+    let first_name = document.querySelector("#addDeliveryAddressFormInputFirstName").value.replace(/^\s+|\s+$/g, '');
+    let last_name = document.querySelector("#addDeliveryAddressFormInputLastName").value.replace(/^\s+|\s+$/g, '');
+    let email = document.querySelector("#addDeliveryAddressFormInputEmail").value.replace(/^\s+|\s+$/g, '');
+    let mobile = document.querySelector("#addDeliveryAddressFormInputMobile").value.replace(/^\s+|\s+$/g, '');
+    let landline = document.querySelector("#addDeliveryAddressFormInputTelephone").value.replace(/^\s+|\s+$/g, '');
+    let landmark = document.querySelector("#addDeliveryAddressFormInputLandmark").value.replace(/^\s+|\s+$/g, '');
+    let address1 = document.querySelector("#addDeliveryAddressFormInputAddresss1").value.replace(/^\s+|\s+$/g, '');
+    let address2 = document.querySelector("#addDeliveryAddressFormInputAddresss2").value.replace(/^\s+|\s+$/g, '');
+    let city = document.querySelector("#addDeliveryAddressFormInputCity").value.replace(/^\s+|\s+$/g, '');
+    let pincode = document.querySelector("#addDeliveryAddressFormInputPincode").value.replace(/^\s+|\s+$/g, '');
+    let state = document.querySelector("#addDeliveryAddressFormInputState").value.replace(/^\s+|\s+$/g, '');
+    let country = document.querySelector("#addDeliveryAddressFormInputCountry").value.replace(/^\s+|\s+$/g, '');
 
-    const request = new XMLHttpRequest();
-    request.open('GET', '/store/get-user-address/');
-    request.onload = () => {
-        const res = JSON.parse(request.responseText);
-        if (res.success) {
-            const details_template = Handlebars.compile(document.querySelector('#checkoutSelectDeliveryAddressHandlebars').innerHTML);
-            const details = details_template({"address": res.address});
-            document.querySelector("#savedDeliveryAddresses").innerHTML = details;
-            document.querySelector("#savedDeliveryAddressModalBtn").click();
-        } else {
-            document.querySelector("#noSavedDeliveryAddressMessageModalBtn").click();
-        }
-    };
-    request.send();
-    return false;
-}
-
-
-function selectThisDeliveryAddress (event, address_id) {
-    event.preventDefault();
-
-    const csrftoken = getCookie('csrftoken');
-    const request = new XMLHttpRequest();
-    request.open('POST', '/store/cart/add-delivery-address/');
-    request.setRequestHeader("X-CSRFToken", csrftoken);
-
-    disable_buttons();
-    prevent_default = true;
-    let spinner_id = `selectThisDeliveryAddressAnchorTagSpinner${address_id}`;
-    let spinner = document.getElementById(spinner_id);
-    spinner.hidden = false;
-
-    request.onload = () => {
-        const res = JSON.parse(request.responseText);
-        if (res.success) {
-            const address_template = Handlebars.compile(document.querySelector('#checkoutSelectedDeliveryAddressHandlebars').innerHTML);
-            const address = address_template(res.delivery_address);
-            document.querySelector("#checkoutDevileryAddressDiv").innerHTML = address;
-            
-            enable_buttons();
-            prevent_default = false;
-            spinner.hidden = true;
-            document.querySelector("#savedDeliveryAddressModalCloseBtn").click();
-        } else {
-            enable_buttons();
-            prevent_default = false;
-            spinner.hidden = true;
-            document.querySelector("#savedDeliveryAddressModalCloseBtn").click();
-            alert(res.message);
-        }
-    };
-
-    const data = new FormData();
-    data.append('address_id', address_id);
-    request.send(data);
-    return false;
-}
-
-
-function removeSelectedDeliveryAddress(event, address_id) {
-    event.preventDefault();
-
-    const csrftoken = getCookie('csrftoken');
-    const request = new XMLHttpRequest();
-    request.open('POST', '/store/cart/remove-delivery-address/');
-    request.setRequestHeader("X-CSRFToken", csrftoken);
-
-    disable_buttons();
-    prevent_default = true;
-    let spinner_id = `removeSelectedDeliveryAddressAnchorTagSpinner${address_id}`;
-    let spinner = document.getElementById(spinner_id);
-    spinner.hidden = false;
-
-    request.onload = () => {
-        const res = JSON.parse(request.responseText);
-        if (res.success) {
-            prevent_default = false;
-            spinner.hidden = true;
-            enable_buttons();
-            const address_template = Handlebars.compile(document.querySelector('#checkoutDeliveryAddressFormHandlebars').innerHTML);
-            const address = address_template();
-            document.querySelector("#checkoutDevileryAddressDiv").innerHTML = address;
-        } else {
-            prevent_default = false;
-            spinner.hidden = true;
-            enable_buttons();
-            alert(res.message);
-        }
-    };
-
-    const data = new FormData();
-    data.append('address_id', address_id);
-    request.send(data);
-    return false;
-}
-
-
-function addNewDeliveryAddress(event) {
-    event.preventDefault();
-
-    let first_name = document.querySelector("#checkoutFormInputFirstName").value.replace(/^\s+|\s+$/g, '');
-    let last_name = document.querySelector("#checkoutFormInputLastName").value.replace(/^\s+|\s+$/g, '');
-    let mobile = document.querySelector("#checkoutFormInputMobile").value.replace(/^\s+|\s+$/g, '');
-    let homephone = document.querySelector("#checkoutFormInputLandline").value.replace(/^\s+|\s+$/g, '');
-    let address1 = document.querySelector("#checkoutFormInputAddress1").value.replace(/^\s+|\s+$/g, '');
-    let address2 = document.querySelector("#checkoutFormInputAddress2").value.replace(/^\s+|\s+$/g, '');
-    let city = document.querySelector("#checkoutFormInputCity").value.replace(/^\s+|\s+$/g, '');
-    let pincode = document.querySelector("#checkoutFormInputPincode").value.replace(/^\s+|\s+$/g, '');
-    let state = document.querySelector("#checkoutFormInputState").value.replace(/^\s+|\s+$/g, '');
-    let country = document.querySelector("#checkoutFormInputCountry").value.replace(/^\s+|\s+$/g, '');
-    let landmark = document.querySelector("#checkoutFormInputLandmark").value.replace(/^\s+|\s+$/g, '');
-    let email = document.querySelector("#checkoutFormInputEmail").value.replace(/^\s+|\s+$/g, '');
-
-    if (!first_name || !last_name || !mobile || !address1 || !city || !state || !pincode || !state || !country || !landmark || !email) {
-        document.querySelector("#addNewDeliveryAddressError").innerHTML = "Incomplete Form";
-        document.querySelector("#checkoutFormInputFirstName").focus();
+    if (!first_name || !last_name || !email || !mobile || !landmark || !address1 || !city || !pincode || !state || !country) {
+        document.getElementById('addDeliveryAddressFormInputFirstName').focus();
+        document.querySelector("#addDeliveryAddressError").innerHTML = "Incomplete Form";
         return false;
     }
 
-    let spinner = document.querySelector("#addNewAddressFormSpinner");
-
     const csrftoken = getCookie('csrftoken');
     const request = new XMLHttpRequest();
-    request.open('POST', '/store/cart/add-new-delivery-address/');
+    request.open('POST', '/store/profile/add-address/');
     request.setRequestHeader("X-CSRFToken", csrftoken);
 
-    disable_buttons();
+    disable();
     prevent_default = true;
-    spinner.hidden = false;
 
     request.onload = () => {
         const res = JSON.parse(request.responseText);
         if (res.success) {
-            prevent_default = false;
-            spinner.hidden = true;
-            enable_buttons();
-            const address_template = Handlebars.compile(document.querySelector('#checkoutSelectedDeliveryAddressHandlebars').innerHTML);
-            const address = address_template(res.delivery_address);
-            document.querySelector("#checkoutDevileryAddressDiv").innerHTML = address;
+            selectDeliveryAddress(false, res.address.id);
         } else {
+            enable();
             prevent_default = false;
-            spinner.hidden = true;
-            enable_buttons();
-            document.querySelector("#addNewDeliveryAddressError").innerHTML = res.message;
-            document.querySelector("#checkoutFormInputFirstName").focus();
+            document.getElementById('addDeliveryAddressFormInputFirstName').focus();
+            document.querySelector("#addDeliveryAddressError").innerHTML = res.message;
         }
     };
 
     const data = new FormData();
     data.append('first_name', first_name);
     data.append('last_name', last_name);
+    data.append('email', email);
     data.append('mobile', mobile);
-    data.append('homephone', homephone);
+    data.append('landline', landline);
+    data.append('landmark', landmark);
     data.append('address1', address1);
     data.append('address2', address2);
     data.append('city', city);
     data.append('pincode', pincode);
     data.append('state', state);
     data.append('country', country);
-    data.append('landmark', landmark);
-    data.append('email', email);
-
     request.send(data);
     return false;
 }
 
 
-function place_order(event) {
-    event.preventDefault();
-    let time = document.querySelector("#OrderConfirmationInputTime").value.replace(/^\s+|\s+$/g, '');
-    let date = document.querySelector("#OrderConfirmationInputDate").value.replace(/^\s+|\s+$/g, '');
-    let info = document.querySelector("#OrderConfirmationInputInfo").value.replace(/^\s+|\s+$/g, '');
+function selectDeliveryAddress(event, address_id) {
+    if (event)
+        event.preventDefault();
+    
+    const csrftoken = getCookie('csrftoken');
+    const request = new XMLHttpRequest();
+    request.open('POST', '/store/checkout/select-delivery-address/');
+    request.setRequestHeader("X-CSRFToken", csrftoken);
 
-    if (info && info.length > 200) {
-        document.querySelector("#placeOrderError").innerHTML = "Maxinum 200 characters allowed.";
+    request.onload = () => {
+        const res = JSON.parse(request.responseText);
+        if (res.success) {
+            enable();
+            prevent_default = false;
+            const address_template = Handlebars.compile(document.querySelector('#checkoutPageAddressHandlebars').innerHTML);
+            const address = address_template(res.address);
+            document.querySelector("#delivery_address").innerHTML = address;
+            if (document.querySelector("#selectDeliveryAddressModalCloseBtn"))
+                document.querySelector("#selectDeliveryAddressModalCloseBtn").click();
+            
+            const details_template = Handlebars.compile(document.querySelector('#checkoutPageCartItemsHandlebars').innerHTML);
+            const details = details_template({"cart": res.cart});
+            document.querySelector("#cart_items").innerHTML = details;
+        } else {
+            enable();
+            prevent_default = false;
+            location.reload();
+        }
+    };
+
+    const data = new FormData();
+    data.append('address_id', address_id);
+    request.send(data);
+    return;
+}
+
+
+function displayDeliveryAddress(event) {
+    event.preventDefault();
+    const request = new XMLHttpRequest();
+    request.open('GET', '/store/checkout/get-delivery-address/');
+
+    request.onload = () => {
+        const res = JSON.parse(request.responseText);
+        if (res.success) {
+            const address_template = Handlebars.compile(document.querySelector('#checkoutPageSelectAddressHandlebars').innerHTML);
+            const address = address_template({"address": res.address});
+            document.querySelector("#selectDeliveryAddressModalDiv").innerHTML = address;
+            document.querySelector("#selectDeliveryAddressModalBtn").click();
+        } else {
+            location.reload();
+        }
+    };
+
+    request.send();
+    return false;
+}
+
+
+function removeSelectedDeliveryAddress(event, address_id) {
+    event.preventDefault();
+    
+    const csrftoken = getCookie('csrftoken');
+    const request = new XMLHttpRequest();
+    request.open('POST', '/store/checkout/remove-selected-delivery-address/');
+    request.setRequestHeader("X-CSRFToken", csrftoken);
+
+    let spinner = document.querySelector("#removeDeliveryAddressSpinner");
+    disable();
+    prevent_default = true;
+    spinner.hidden = false;
+
+    request.onload = () => {
+        const res = JSON.parse(request.responseText);
+        if (res.success) {
+            enable();
+            prevent_default = false;
+            spinner.hidden = true;
+            const address_template = Handlebars.compile(document.querySelector('#checkoutPageAddressFormHandlebars').innerHTML);
+            const address = address_template();
+            document.querySelector("#delivery_address").innerHTML = address;
+            document.querySelector("#addDeliveryAddressFormInputFirstName").focus();
+
+            const details_template = Handlebars.compile(document.querySelector('#checkoutPageCartItemsHandlebars').innerHTML);
+            const details = details_template({"cart": res.cart});
+            document.querySelector("#cart_items").innerHTML = details;
+        } else {
+            enable();
+            prevent_default = false;
+            spinner.hidden = true;
+            location.reload();
+        }
+    };
+
+    const data = new FormData();
+    data.append('address_id', address_id);
+    request.send(data);
+    return;
+}
+
+
+function placeOrder(event) {
+    event.preventDefault();
+    document.querySelector("#placeOrderError").innerHTML = '';
+
+    let payment_method = document.querySelector('input[name="checkoutPaymentMethod"]:checked').value.replace(/^\s+|\s+$/g, '');
+    let preferred_date = document.querySelector("#checkoutPreferredDate").value.replace(/^\s+|\s+$/g, '');
+    let preferred_time = document.querySelector("#checkoutPreferredTime").value.replace(/^\s+|\s+$/g, '');
+
+    var date = '';
+    if (preferred_date && preferred_time)
+        date = new Date(preferred_date + ' ' + preferred_time).toUTCString();
+    else if (preferred_date)
+        date = new Date(preferred_date).toUTCString();
+    
+    if (!payment_method) {
+        document.querySelector("#placeOrderError").innerHTML = "Please select a payment method.";
         return false;
     }
 
@@ -223,30 +218,34 @@ function place_order(event) {
     request.open('POST', '/store/checkout/place-order/');
     request.setRequestHeader("X-CSRFToken", csrftoken);
 
-    let spinner = document.querySelector("#placeOrderConfirmationSpinner");
-    disable_buttons();
+    let spinner = document.querySelector("#chechoutPlaceOrderSpinner");
+    disable();
     prevent_default = true;
     spinner.hidden = false;
 
     request.onload = () => {
         const res = JSON.parse(request.responseText);
         if (res.success) {
-            enable_buttons();
+            enable();
             prevent_default = false;
             spinner.hidden = true;
             window.location.replace(res.return_url);
         } else {
-            enable_buttons();
-            prevent_default = false;
-            spinner.hidden = true;
-            document.querySelector("#placeOrderError").innerHTML = res.message;
+            if (res.reload) {
+                prevent_default = false;
+                window.location.replace(res.reload_url);
+            } else {
+                enable();
+                spinner.hidden = true;
+                prevent_default = false;
+                document.querySelector("#placeOrderError").innerHTML = res.message;
+            }
         }
     };
 
     const data = new FormData();
-    data.append('time', time);
-    data.append('date', date);
-    data.append('info', info);
+    data.append('payment_method', payment_method);
+    data.append('datetime', date);
     request.send(data);
-    return false;
+    return;
 }

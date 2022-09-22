@@ -1,0 +1,225 @@
+<!-- Account Details modal -->
+<script id="accountDetailsHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="card" style="width: 100%;">
+        <div class="card-header text-muted">
+            <div class="row">
+                <div class="col text-start">Date Joined</div>
+                <div class="col text-end">{{ user.date_joined }}</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{user.first_name}} {{user.last_name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{user.username}}</h6>
+            <p class="card-text">
+                <div>{{user.email}}</div>
+            </p>
+            <a href="{{user.authentication_account}}" class="card-link link-danger-dark toDisableAnchorTag" >Update Details</a>
+            <a href="" onclick="displayAddAddressFormModal(event);" class="card-link link-danger-dark toDisableAnchorTag" >Add Address</a>
+        </div>
+        <div class="card-footer text-muted">
+            <div class="row">
+                <div class="col text-start">Last Login</div>
+                <div class="col text-end">{{ user.last_login }}</div>
+            </div>
+        </div>
+    </div><hr>
+    {{#if address}}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {{#each address}}
+        <div class="col">
+            <div class="card h-100 w-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{this.email}}</h6>
+                    <p class="card-text">
+                        <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
+                        <div><i class="bi bi-telephone me-2"></i>{{#if this.landline}}{{this.landline}}{{else}}-{{/if}}</div>
+                        <div><i class="bi bi-mailbox me-2"></i>Delivery Address</div>
+                        <div class="ms-4">
+                            <span>{{this.address1}}</span><br>
+                            <span>{{#if this.address2}}{{this.address2}}{{else}}-{{/if}}</span><br>
+                            <span>{{this.city}} - {{this.pincode}}</span><br>
+                            <span>{{this.state}} - {{this.country}}</span><br>
+                        </div>
+                        <div><i class="bi bi-signpost me-2"></i>{{this.landmark}}</div>
+                    </p>
+                    {{#if this.editable}}
+                    <div>
+                        <a href="" class="card-link link-danger-dark toDisableAnchorTag" onclick="deleteAddress(event, '{{this.id}}');">
+                            Delete Address
+                            <div class="spinner-grow spinner-grow-sm" id="deleteAddressSpinner{{this.id}}" hidden role="status"></div>
+                        </a>
+                        <a href="" class="card-link link-danger-dark toDisableAnchorTag" onclick="displayEditAddressModal(event, '{{this.id}}');">Edit Address</a>
+                    </div>
+                    {{else}}
+                    <br>
+                    {{/if}}
+                    {{#if this.is_primary}}
+                    <span class="text-success">Primary Address</span>
+                    {{else}}
+                    <a href="" onclick="makeAddressPrimary(event, '{{this.id}}')" class="card-link link-danger-dark toDisableAnchorTag">
+                        Make Primary
+                        <div class="spinner-grow spinner-grow-sm" id="makeAddressPrimarySpinner{{this.id}}" hidden role="status"></div>
+                    </a>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    {% endverbatim %}
+</script>
+
+
+<!-- Add address modal -->
+<script id="addAddressFormHandlebars" type="text/x-handlebars-template">
+    <div class="modal fade" id="addAddressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add Address</h5>
+                    <button type="button" class="btn-close toDisable" data-bs-dismiss="modal" aria-label="Close" id="addAddressModalCloseBtn"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <form class="row g-2" id="addAddressForm" onsubmit="addAddress(event);">
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputFirstName" class="form-label"><span class="requirement">*</span>First Name</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputFirstName">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputLastName" class="form-label"><span class="requirement">*</span>Last Name</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputLastName">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputEmail" class="form-label"><span class="requirement">*</span>Email</label>
+                            <input type="email" class="form-control form-control-sm toDisable" id="addAddressFormInputEmail">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputMobile" class="form-label"><span class="requirement">*</span>Mobile Number</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputMobile">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputTelephone" class="form-label">Home Phone Number</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputTelephone">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="addAddressFormInputLandmark" class="form-label"><span class="requirement">*</span>Landmark</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputLandmark">
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <label for="addAddressFormInputAddresss1" class="form-label"><span class="requirement">*</span>Address Line 1</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputAddresss1">
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <label for="addAddressFormInputAddresss2" class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputAddresss2">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="addAddressFormInputCity" class="form-label"><span class="requirement">*</span>City</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputCity">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="addAddressFormInputPincode" class="form-label"><span class="requirement">*</span>Pincode</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputPincode">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="addAddressFormInputState" class="form-label"><span class="requirement">*</span>State</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputState">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="addAddressFormInputCountry" class="form-label"><span class="requirement">*</span>Country</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="addAddressFormInputCountry">
+                        </div>
+                    </form>
+                    <div id="addAddressError" class="errormessage"><br></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-sm btn btn-outline-dark w-25 me-auto toDisable" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="addAddressForm" class="btn-sm btn btn-outline-dark w-25 ms-auto toDisable">
+                        <div class="spinner-border spinner-border-sm toHide" hidden role="status"></div>
+                        Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<!-- Edit address modal -->
+<script id="editAddressFormHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="modal fade" id="editAddressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                    <button type="button" class="btn-close toDisable" data-bs-dismiss="modal" aria-label="Close" id="editAddressModalCloseBtn"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <form class="row g-2" id="editAddressForm" onsubmit="editAddress(event, '{{id}}');">
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputFirstName" class="form-label"><span class="requirement">*</span>First Name</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputFirstName" value="{{first_name}}">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputLastName" class="form-label"><span class="requirement">*</span>Last Name</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputLastName" value="{{last_name}}">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputEmail" class="form-label"><span class="requirement">*</span>Email</label>
+                            <input type="email" class="form-control form-control-sm toDisable" id="editAddressFormInputEmail" value="{{email}}">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputMobile" class="form-label"><span class="requirement">*</span>Mobile Number</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputMobile" value="{{mobile}}">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputTelephone" class="form-label">Home Phone Number</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputTelephone" value="{{landline}}">
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <label for="editAddressFormInputLandmark" class="form-label"><span class="requirement">*</span>Landmark</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputLandmark" value="{{landmark}}">
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <label for="editAddressFormInputAddresss1" class="form-label"><span class="requirement">*</span>Address Line 1</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputAddresss1" value="{{address1}}">
+                        </div>
+                        <div class="col-md-12 col-lg-6">
+                            <label for="editAddressFormInputAddresss2" class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputAddresss2" value="{{address2}}">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="editAddressFormInputCity" class="form-label"><span class="requirement">*</span>City</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputCity" value="{{city}}">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="editAddressFormInputPincode" class="form-label"><span class="requirement">*</span>Pincode</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputPincode" value="{{pincode}}">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="editAddressFormInputState" class="form-label"><span class="requirement">*</span>State</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputState" value="{{state}}">
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <label for="editAddressFormInputCountry" class="form-label"><span class="requirement">*</span>Country</label>
+                            <input type="text" class="form-control form-control-sm toDisable" id="editAddressFormInputCountry" value="{{country}}">
+                        </div>
+                    </form>
+                    <div id="editAddressError" class="errormessage"><br></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-sm btn btn-outline-dark w-25 me-auto toDisable" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="editAddressForm" class="btn-sm btn btn-outline-dark w-25 ms-auto toDisable">
+                        <div class="spinner-border spinner-border-sm toHide" hidden role="status"></div>
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+</script>

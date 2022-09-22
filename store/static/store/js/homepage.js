@@ -1,87 +1,121 @@
-function get_variations(product_id) {
-    let btn_id = `add_variation_btn_${product_id}`;
-    document.getElementById(btn_id).blur();
-
+function categorySelected() {
+    clistID = "filterCategoryListOffcanvas";
+    plistID = "filterProductListOffcanvas";
+    slistID = "filterSortItemsOffcanvas";
+    let category = document.getElementById(clistID).value.replace(/^\s+|\s+$/g, '');
+    
     const csrftoken = getCookie('csrftoken');
     const request = new XMLHttpRequest();
-    request.open('POST', '/store/products/get-variations/');
+    request.open('POST', '/store/get-products/');
     request.setRequestHeader("X-CSRFToken", csrftoken);
+
+    disable();
+    prevent_default = true;
 
     request.onload = () => {
         const res = JSON.parse(request.responseText);
-        if (res.success) {
-            const details_template = Handlebars.compile(document.querySelector('#productVariationsHandlebars').innerHTML);
-            const details = details_template({"title": res.product_name, "variations": res.variations});
-            document.querySelector("#productVariationsModalDialog").innerHTML = details;
-            document.querySelector("#productVariationsModalBtn").click();
-        } else {
-            alert(res.message);
+        if (res.products) {
+            const details_template = Handlebars.compile(document.querySelector('#productFilterOptionsHandlebars').innerHTML);
+            const details = details_template({"products": res.products});
+            document.getElementById(plistID).innerHTML = details;
+
+            const details_template_sort = Handlebars.compile(document.querySelector('#sortFilterOptionsHandlebars').innerHTML);
+            const details_sort = details_template_sort();
+            document.getElementById(slistID).innerHTML = details_sort;
         }
+        enable();
+        prevent_default = false;
     };
 
     const data = new FormData();
-    data.append('product_id', product_id);
+    data.append('category', category);
     request.send(data);
     return false;
 }
 
 
-function add2cart(event, var_id) {
+function add2cart(event, product_id) {
     event.preventDefault();
-    let input_id = `variationQtyFormInput${var_id}`;
-    let btn_id = `add2cartBtn${var_id}`;
-    let error_id = `add2cartError${var_id}`;
-    let cartIconId = `cartCheckIcon${var_id}`;
-    let spinnerID = `add2cartSpinner${var_id}`
-    let spinner = document.getElementById(spinnerID);
 
-    let qty = document.getElementById(input_id).value.replace(/^\s+|\s+$/g, '');
-    if (!qty || isNaN(qty) || qty <= 0) {
-        document.getElementById(btn_id).blur();
-        document.getElementById(input_id).value = '';
-        document.getElementById(input_id).focus();
-        document.getElementById(cartIconId).style.color = "red";
+    let inputID = `addToCartInput${product_id}`;
+    let cartIconID = `cartIcon${product_id}`;
+    let cartSubmitBtn = `cartSubmitBtn${product_id}`;
+    let qty = document.getElementById(inputID).value.replace(/^\s+|\s+$/g, '');
+
+    if (!qty || isNaN(qty) || qty < 1) {
+        document.getElementById(inputID).value = '';
+        document.getElementById(cartSubmitBtn).blur();
+        document.getElementById(cartIconID).innerHTML = '<i class="bi bi-cart-x text-danger"></i>';
         return false;
     }
 
     const csrftoken = getCookie('csrftoken');
     const request = new XMLHttpRequest();
-    request.open('POST', '/store/products/add-to-cart/');
+    request.open('POST', '/store/add-to-cart/');
     request.setRequestHeader("X-CSRFToken", csrftoken);
-
-    prevent_default = true;
-    disable_buttons();
-    spinner.hidden = false;
 
     request.onload = () => {
         const res = JSON.parse(request.responseText);
         if (res.success) {
-            prevent_default = false;
-            enable_buttons();
-            spinner.hidden = true;
-            document.getElementById(btn_id).blur();
-            document.getElementById(input_id).value = '';
-            document.getElementById(cartIconId).style.color = "green";
+            document.getElementById(cartIconID).innerHTML = '<i class="bi bi-cart-check text-success"></i>'
             update_cart_count(res.count);
+            document.getElementById(inputID).value = '';
         } else {
-            prevent_default = false;
-            enable_buttons();
-            spinner.hidden = true;
-            document.getElementById(error_id).innerHTML = res.message;
-            document.getElementById(cartIconId).style.color = "red";
+            document.getElementById(cartIconID).innerHTML = '<i class="bi bi-cart-x text-danger"></i>';
+            if (res.out_of_stock) {
+                document.getElementById(inputID).value = res.out_of_stock;
+            } else {
+                document.getElementById(inputID).value = '';
+            }
         }
+        document.getElementById(cartSubmitBtn).blur();
     };
 
     const data = new FormData();
-    data.append('var_id', var_id);
     data.append('qty', qty);
+    data.append('variation_id', product_id);
     request.send(data);
     return false;
 }
 
 
-// const registerVerificationModal = document.getElementById('registerVerificationModal');
-// const registerVerifyCode = document.getElementById('registerVerifyCode');
-// registerVerificationModal.addEventListener('shown.bs.modal', () => {
-//     registerVerifyCode.focus();
-// })
+function checkDeliverability(event, variation_id) {
+    event.preventDefault();
+
+    document.querySelector("#checkPincodeInfoSuccess").innerHTML = '';
+    document.querySelector("#checkPincodeInfoDanger").innerHTML = '';
+
+    let pincode = document.querySelector("#checkPincodeFormInput").value.replace(/^\s+|\s+$/g, '');
+
+    if (!pincode) {
+        document.querySelector("#checkPincodeFormInputBtn").blur();
+        return false;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    const request = new XMLHttpRequest();
+    request.open('POST', '/store/check-deliverability/');
+    request.setRequestHeader("X-CSRFToken", csrftoken);
+
+    disable();
+    prevent_default = true;
+
+    request.onload = () => {
+        const res = JSON.parse(request.responseText);
+        if (res.success) {
+            document.querySelector("#checkPincodeInfoSuccess").innerHTML = res.message;
+        } else {
+            document.querySelector("#checkPincodeInfoDanger").innerHTML = res.message;
+        }
+        enable();
+        prevent_default = false;
+        document.querySelector("#checkPincodeFormInputBtn").blur();
+        document.querySelector("#checkPincodeFormInput").value = '';
+    };
+
+    const data = new FormData();
+    data.append('pincode', pincode);
+    data.append('variation_id', variation_id);
+    request.send(data);
+    return false;
+}

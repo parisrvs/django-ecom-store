@@ -1,100 +1,87 @@
 <script id="cartOffcanvasHandlebars" type="text/x-handlebars-template">
     {% verbatim %}
-    <div class="row text-center">
-        <div class="col-6 text-start">
-            <h5>Total Amount</h5>
+    <div>
+        <div class="row">
+            <div class="col-7 text-start"><h5>Amount ({{cart.currency}})</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.amount}}</h5></div>
         </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} <span id="cartTotalAmount">{{total}}</span></h5>
+        {{#if cart.cart_amount.discount}}
+        <div class="row">
+            <div class="col-7 text-start"><h5>Discount (%)</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.discount}}</h5></div>
+        </div>
+        {{else}}
+        <form class="row" onsubmit="applyDiscount(event);">
+            <div class="col-8 text-start">
+                <input type="text" class="form-control form-control-sm" id="cartDiscountFormInput" placeholder="Discount Code">
+            </div>
+            <div class="col-4 text-end">
+                <button type="submit" class="btn btn-sm btn-outline-dark w-100" id="cartDiscountFormSubmitBtn">Apply</button>
+            </div>
+        </form>
+        <div id="discountCodeError" class="errormessage"><br></div>
+        {{/if}}
+        <div class="row">
+            <div class="col-7 text-start"><h5>Amount Payable ({{cart.currency}})</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.amount_payable}}</h5></div>
         </div>
     </div>
-    <div id="cartOffcanvasDiscount" class="text-center"></div>
-    <a class="w-100 btn btn-sm btn-outline-dark my-2 toDisableAnchorTag" type="button" role="button" href="{{checkout_url}}">Checkout</a>
-    <ol class="list-unstyled">
-        {{#each cart}}
-        <li id="cartItemList{{this.id}}">
-            <h5 class="pb-0 mb-0">
-                <a href="{{variation_url}}" class="link-danger-dark">{{this.title}}</a>
-                <a href="" class="toDisableAnchorTag" style="text-decoration: none;" onclick="removeFromCart(event, '{{this.id}}')">
-                    <i class="bi bi-x-circle text-danger"></i>
-                </a>
-            </h5>
-            <div class="table-responsive text-start">
-                <table class="table table-sm table-borderless align-middle caption-top pb-0 mb-0">
-                    <caption class="p-0 m-0">Product Details</caption>
-                    <tbody>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Unit Price</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.price}} / {{this.unit}}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Qty</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.qty}} {{this.unit}}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Amount</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.amount}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+    <a type="button" role="button" href="{{cart.checkout_url}}" class="btn btn-sm btn-outline-dark w-100">Checkout</a>
+    <h6>Items ({{cart.count}})</h6>
+    {{#each cart.cart_items}}
+        <h5 class="mb-0 pb-0">
+            {{this.title}}
+            <a href="" onclick="removeFromCart(event, '{{this.id}}')"><i class="bi bi-trash3-fill text-danger ms-2"></i></a>
+        </h5>
+        <div class="table-responsive mt-0 pt-0">
+            {{#if this.key_value_pair}}
+            <div class="accordion" id="productSpecsAccordion{{this.id}}">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="productSpecsHeading{{this.id}}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#productSpecs{{this.id}}" 
+                        aria-expanded="false" aria-controls="productSpecs{{this.id}}">
+                            Specifications
+                        </button>
+                    </h2>
+                    <div id="productSpecs{{this.id}}" class="accordion-collapse collapse" aria-labelledby="productSpecsHeading{{this.id}}" data-bs-parent="#productSpecsAccordion{{this.id}}">
+                        <div class="accordion-body">
+                            <table class="table my-0 py-0 table-sm table-borderless text-center">
+                                <tbody>
+                                    {{#each this.key_value_pair}}
+                                    <tr>
+                                        <td style="width: 35%;" class="my-0 py-0">{{this.key}}</td>
+                                        <td style="width: 65%;" class="my-0 py-0">{{this.value}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="table-responsive text-start">
-                <table class="table table-sm table-borderless align-middle caption-top">
-                    {{#if this.keyvalues}}
-                    <caption class="p-0 m-0">Product Variation</caption>
-                    <tbody>
-                        {{#each this.keyvalues}}
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">{{this.key}}</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.value}}</td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                    {{/if}}
-                </table>
-            </div>
-        </li>
-        {{/each}}
-    </ol>
-    <a class="toDisableAnchorTag link-danger-dark" href="" onclick="clearCart(event);">Clear Cart</a>
-    {% endverbatim %}
-</script>
-
-
-<script id="cartOffcanvasDicountFormHandlebars" type="text/x-handlebars-template">
-    <form class="row g-2 align-items-center" onsubmit="applyDiscount(event);">
-        <div class="col-8 me-auto">
-            <label class="visually-hidden" for="cartDiscountFormInput">Code</label>
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control toDisable" id="cartDiscountFormInput" placeholder="Dicsount Code">
-            </div>
-        </div>
-        <div class="col-4 ms-auto">
-            <button type="submit" class="btn btn-outline-dark btn-sm w-100 toDisable" id="cartDiscountFormSubmitBtn">
-                <div class="spinner-border spinner-border-sm text-dark" id="applyDiscountSpinner" hidden role="status"></div>
-                Apply
-            </button>
-        </div>
-    </form>
-    <div class="errormessage" id="cartDiscountError"><br></div>
-</script>
-
-
-<script id="cartOffcanvasDicountInfoHandlebars" type="text/x-handlebars-template">
-    {% verbatim %}
-    <div class="row">
-        <div class="col-6 text-start">
-            Discount ({{percent}}%)
-        </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} {{discounted_amount}}</h5>
-        </div>
-        <div class="col-6 text-start">
-            <h5>Amt. Payable</h5>
-        </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} {{amount_payable}}</h5>
-        </div>
-    </div>
+            {{/if}}
+            <table class="table my-0 py-0 table-sm table-borderless text-center">
+                <thead>
+                    <tr>
+                        <th class="my-0 py-0">Price ({{this.currency}})</th>
+                        <th class="my-0 py-0">Qty ({{this.unit}})</th>
+                        <th class="my-0 py-0">Amt. ({{this.currency}})</th>
+                        <th class="my-0 py-0">Disc (%)</th>
+                        <th class="my-0 py-0">Payable ({{this.currency}})</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="my-0 py-0">{{this.unit_price}}</td>
+                        <td class="my-0 py-0">{{this.qty}}</td>
+                        <td class="my-0 py-0">{{this.amount}}</td>
+                        <td class="my-0 py-0">{{this.discount}}</td>
+                        <td class="my-0 py-0">{{this.amount_payable}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div><hr class="mt-0 pt-0">
+    {{/each}}
+    <a href="" class="link-danger-dark" onclick="clearCart(event);">Clear Cart</a>
     {% endverbatim %}
 </script>

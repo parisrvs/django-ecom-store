@@ -1,0 +1,33 @@
+{% extends 'store/layout/layout.html' %}
+{% load static %}
+
+
+{% block title %}Account{% endblock %}
+{% block style %}{% endblock %}
+
+
+{% block body %}
+<div class="container mt-2 mb-5">
+    <div id="user_info"></div>
+</div>
+<div id="addAddressFormDiv"></div>
+<div id="editAddressFormDiv"></div>
+
+
+<!-- Modal Buttons -->
+<div style="display: none;">
+    <!-- Add address button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal" id="addAddressModalBtn">
+        Launch static backdrop modal
+    </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal" id="editAddressModalBtn">
+        Launch static backdrop modal
+    </button>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script src="{% static 'store/js/profile.js' %}"></script>
+{% include 'store/handlebars/profile.html' %}
+{% endblock %}

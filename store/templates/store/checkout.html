@@ -5,17 +5,31 @@
 {% block title %}Checkout{% endblock %}
 {% block style %}{% endblock %}
 
+
 {% block body %}
-<div class="container text-center mt-2 mb-3" id="checkoutMainPage">
-    <h2 class="mb-0">Checkout</h2>
-    <small class="text-muted">Confirm Order</small><hr class="mt-0">
+<div class="container text-center" id="checkoutMainPage" style="margin-bottom: 30px;">
+    <h4>Checkout</h4>
+    {% if messages %}
+    <ul class="messages list-unstyled text-center">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }} text-danger"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <hr>
     <div class="row">
-        <div class="col-lg-6" id="checkoutDevileryAddressDiv"></div>
-        <div class="col-lg-6" id="confirmCheckoutDiv"></div>
+        <div class="col-md-6 text-start" id="delivery_address"></div>
+        <div class="col-md-6 text-start" id="cart_items"></div>
     </div>
+    <div id="selectDeliveryAddressModalDiv" class="text-start"></div>
 </div>
-{% include 'store/modals/checkout.html' %}
+<div style="display: none;">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectDeliveryAddressModal" id="selectDeliveryAddressModalBtn">
+        Launch demo modal
+    </button>
+</div>
 {% endblock %}
+
 
 {% block script %}
 <script src="{% static 'store/js/checkout.js' %}"></script>

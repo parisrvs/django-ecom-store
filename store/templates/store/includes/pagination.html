@@ -1,0 +1,73 @@
+<div class="my-3 text-center">
+    {% if page_obj.has_previous %}
+        {% if filter_query %}
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="{{filter_query}}page=1" style="width: 50px;">
+                First
+            </a>
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="{{filter_query}}page={{ page_obj.previous_page_number }}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        {% elif search_query %}
+            {% if search_filter_query %}
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&{{search_filter_query.url}}&page=1" style="width: 50px;">
+                    First
+                </a>
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&{{search_filter_query.url}}&page={{ page_obj.previous_page_number }}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            {% else %}
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&page=1" style="width: 50px;">
+                    First
+                </a>
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&page={{ page_obj.previous_page_number }}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            {% endif %}
+        {% else %}
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?page=1" style="width: 50px;">
+                First
+            </a>
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?page={{ page_obj.previous_page_number }}">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        {% endif %}
+    {% endif %}
+
+    <button type="button" role="button" class="btn-sm btn btn-outline-dark" disabled>
+        {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </button>
+
+    {% if page_obj.has_next %}
+        {% if filter_query %}
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="{{filter_query}}page={{ page_obj.next_page_number }}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="{{filter_query}}page={{ page_obj.paginator.num_pages }}" style="width: 50px;">
+                Last
+            </a>
+        {% elif search_query %}
+            {% if search_filter_query %}
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&{{search_filter_query.url}}&page={{ page_obj.next_page_number }}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&{{search_filter_query.url}}&page={{ page_obj.paginator.num_pages }}" style="width: 50px;">
+                    Last
+                </a>
+            {% else %}
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&page={{ page_obj.next_page_number }}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+                <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?q={{search_query}}&page={{ page_obj.paginator.num_pages }}" style="width: 50px;">
+                    Last
+                </a>
+            {% endif %}
+        {% else %}
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?page={{ page_obj.next_page_number }}">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+            <a type="button" role="button" class="btn-sm btn btn-outline-dark" href="?page={{ page_obj.paginator.num_pages }}" style="width: 50px;">
+                Last
+            </a>
+        {% endif %}
+    {% endif %}
+</div>

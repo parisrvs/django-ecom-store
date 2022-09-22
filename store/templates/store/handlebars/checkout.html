@@ -1,216 +1,278 @@
-<script id="checkoutItemsHandlebars" type="text/x-handlebars-template">
+<script id="checkoutPageCartItemsHandlebars" type="text/x-handlebars-template">
     {% verbatim %}
-    <div class="row text-center">
-        <div class="col-6 text-start">
-            <h5>Total Amount</h5>
+    <div class="container text-center mt-3 mt-md-0">
+        <h5>
+            Cart
+            <a href="" class="link-danger-dark toDisableAnchorTag" onclick="displayCart(event);"><i class="bi bi-pencil"></i></a>
+        </h5>
+        <div class="row">
+            <div class="col-7 text-start"><h5>Amount ({{cart.currency}})</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.amount}}</h5></div>
+            {{#if cart.cart_amount.discount}}
+            <div class="col-7 text-start"><h5>Discount (%)</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.discount}}</h5></div>
+            {{/if}}
+            <div class="col-7 text-start"><h5>Amount Payable ({{cart.currency}})</h5></div>
+            <div class="col-5 text-end"><h5>{{cart.cart_amount.amount_payable}}</h5></div>
         </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} {{total}}</h5>
-        </div>
-    </div>
-    <div id="checkoutDiscountInfoDiv"></div>
-    <hr class="mt-0 mb-1">
-    <h5><span>{{items_count}}</span> Cart Item(s)</h5>
-    <ol class="list-unstyled">
-        {{#each cart}}
-        <li class="text-start">
-            <h6 class="text-start lead strong pb-0 mb-0"><a href="{{this.variation_url}}" class="link-danger-dark">{{this.title}}</a></h6>
-            <div class="table-responsive text-start">
-                <table class="table table-sm table-borderless align-middle caption-top pb-0 mb-0">
-                    <caption class="p-0 m-0">Product Details</caption>
-                    <tbody>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Unit Price</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.price}} / {{this.unit}}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Qty</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.qty}} {{this.unit}}</td>
-                        </tr>
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">Amount</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.currency}} {{this.amount}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="table-responsive text-start">
-                <table class="table table-sm table-borderless align-middle caption-top">
-                    {{#if this.keyvalues}}
-                    <caption class="p-0 m-0">Product Variation</caption>
-                    <tbody>
-                        {{#each this.keyvalues}}
-                        <tr>
-                            <td style="width: 35%;" class="m-0 p-0">{{this.key}}</td>
-                            <td style="width: 65%;" class="m-0 p-0">{{this.value}}</td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                    {{/if}}
-                </table>
-            </div>
-        </li>
-        {{/each}}
-    </ol>
-    {% endverbatim %}
-</script>
-
-
-<script id="checkoutDicountInfoHandlebars" type="text/x-handlebars-template">
-    {% verbatim %}
-    <div class="row">
-        <div class="col-6 text-start">
-            Discount ({{percent}}%)
-        </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} {{discounted_amount}}</h5>
-        </div>
-        <div class="col-6 text-start">
-            <h5>Amt. Payable</h5>
-        </div>
-        <div class="col-6 text-end">
-            <h5>{{currency}} {{amount_payable}}</h5>
-        </div>
-    </div>
-    {% endverbatim %}
-</script>
-
-<script id="checkoutDeliveryAddressFormHandlebars" type="text/x-handlebars-template">
-    <h6>Add Address / <a class="link-danger-dark toDisableAnchorTag" onclick="selectSavedAddress(event);" href="">Select a Saved Address</a></h6>
-    <form class="row g-2" onsubmit="addNewDeliveryAddress(event);">
-        <div class="col-md-6">
-            <label for="checkoutFormInputFirstName" class="form-label"><span class="requirement">*</span>First Name</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputFirstName" placeholder="First Name" autofocus>
-        </div>
-        <div class="col-md-6">
-            <label for="checkoutFormInputLastName" class="form-label"><span class="requirement">*</span>Last Name</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLastName" placeholder="Last Name">
-        </div>
-    
-        <div class="col-md-6">
-            <label for="checkoutFormInputMobile" class="form-label"><span class="requirement">*</span>Mobile Number</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputMobile" placeholder="Mobile Number">
-        </div>
-        <div class="col-md-6">
-            <label for="checkoutFormInputLandline" class="form-label">Home Phone #</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLandline" placeholder="Landline Number">
-        </div>
-    
-        <div class="col-md-12">
-            <label for="checkoutFormInputAddress1" class="form-label"><span class="requirement">*</span>Address Line 1</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputAddress1" placeholder="Address Line 1">
-        </div>
-        <div class="col-md-12">
-            <label for="checkoutFormInputAddress2" class="form-label">Address Line 2</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputAddress2" placeholder="Address Line 2">
-        </div>
-    
-        <div class="col-md-6">
-            <label for="checkoutFormInputCity" class="form-label"><span class="requirement">*</span>City</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputCity" placeholder="City">
-        </div>
-        <div class="col-md-6">
-            <label for="checkoutFormInputPincode" class="form-label"><span class="requirement">*</span>Pin / Zip Code</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputPincode" placeholder="Pin / Zip Code">
-        </div>
-    
-        <div class="col-md-6">
-            <label for="checkoutFormInputState" class="form-label"><span class="requirement">*</span>State</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputState" placeholder="State">
-        </div>
-        <div class="col-md-6">
-            <label for="checkoutFormInputCountry" class="form-label"><span class="requirement">*</span>Country</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputCountry" placeholder="Country">
-        </div>
-    
-        <div class="col-md-6">
-            <label for="checkoutFormInputLandmark" class="form-label"><span class="requirement">*</span>Landmark</label>
-            <input type="text" class="form-control form-control-sm toDisable" id="checkoutFormInputLandmark" placeholder="Landmark">
-        </div>
-        <div class="col-md-6">
-            <label for="checkoutFormInputEmail" class="form-label"><span class="requirement">*</span>Email</label>
-            <input type="email" class="form-control form-control-sm toDisable" id="checkoutFormInputEmail" placeholder="abc@example.com">
-        </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-outline-dark btn-sm mt-2 toDisable">
-                <span class="spinner-border spinner-border-sm text-dark" role="status" aria-hidden="true" hidden id="addNewAddressFormSpinner"></span>
-                Continue
-            </button>
-        </div>
-    </form>
-    <div class="errormessage my-2" id="addNewDeliveryAddressError"></div>
-</script>
-
-<script id="checkoutSelectDeliveryAddressHandlebars" type="text/x-handlebars-template">
-    {% verbatim %}
-        <div class="row row-cols-1 row-cols-lg-2 g-4 text-start">
-            {{#each address}}
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-envelope me-2"></i>{{this.email}}</h6>
-                        <p class="card-text">
-                            <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
-                            <div>
-                                <i class="bi bi-telephone me-2"></i>
-                                {{#if this.homephone}}{{this.homephone}}{{else}}<span class="ms-5">-</span>{{/if}}
-                            </div>
-                            <div><i class="bi bi-mailbox"></i><span class="ms-2">Delivery Address</span></i></div>
-                            <div class="ms-4">{{this.address1}}</div>
-                            <div class="ms-4">{{#if this.address2}}{{this.address2}}{{else}}<br>{{/if}}</div>
-                            <div class="ms-4">{{this.pincode}}, {{this.city}}</div>
-                            <div class="ms-4">{{this.state}}, {{this.country}}</div>
-                            <div class="ms-4">{{this.landmark}}</div>
-                        </p>
-                        <a href="" onclick="selectThisDeliveryAddress(event, '{{this.id}}')" class="card-link link-danger-dark toDisableAnchorTag">Select this delivery address.</a>
-                        <span class="spinner-grow text-primary spinner-grow-sm" role="status" hidden id="selectThisDeliveryAddressAnchorTagSpinner{{this.id}}"></span>
+        <h6>{{cart.count}} Item(s)</h6>
+        <div class="accordion">
+            {{#each cart.cart_items}}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{this.id}}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{this.id}}" aria-expanded="true" aria-controls="collapse{{this.id}}">
+                        <span class="me-auto">{{this.title}}</span>
+                        {{#if this.discount}}
+                        <span class="ms-auto">{{this.discount}}% off</span>
+                        {{/if}}
+                    </button>
+                </h2>
+                <div id="collapse{{this.id}}" class="accordion-collapse collapse show" aria-labelledby="heading{{this.id}}">
+                    <div class="accordion-body">
+                        <h6 class="text-start mb-0">Product ID: {{this.id}}</h6>
+                        {{#if this.zipcode_availability}}
+                            {{#if this.zipcode_availability.availability}}
+                            <h6 class="mt-0 text-start text-success">Delivery In: {{this.zipcode_availability.delivery_time_in_days}} day(s)</h6>
+                            {{else}}
+                            <h6 class="mt-0 text-start text-danger">This item is not deliverable at your location.</h6>
+                            {{/if}}
+                        {{else}}
+                            <h6 class="mt-0 text-start text-success">Delivery In: {{this.delivery_time_in_days}} day(s)</h6>
+                        {{/if}}
+                        <div class="table-responsive">
+                            {{#if this.key_value_pair}}
+                            <table class="table table-sm table-borderless text-center mb-0">
+                                <tbody>
+                                    {{#each this.key_value_pair}}
+                                    <tr>
+                                        <td style="width: 35%;">{{this.key}}</td>
+                                        <td style="width: 65%;">{{this.value}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                            {{/if}}
+                            <table class="table table-sm table-borderless text-center  mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Price ({{this.currency}})</th>
+                                        <th>Qty ({{this.unit}})</th>
+                                        <th>Amt. ({{this.currency}})</th>
+                                        <th>Payable ({{this.currency}})</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{this.unit_price}}</td>
+                                        <td>{{this.qty}}</td>
+                                        <td>{{this.amount}}</td>
+                                        <td>{{this.amount_payable}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
             {{/each}}
         </div>
+    </div>
     {% endverbatim %}
 </script>
 
-<script id="checkoutSelectedDeliveryAddressHandlebars" type="text/x-handlebars-template">
+
+<script id="checkoutPageAddressFormHandlebars" type="text/x-handlebars-template">
     {% verbatim %}
-    <h6>
-        <a href="" class="link-danger-dark toDisableAnchorTag" onclick="removeSelectedDeliveryAddress(event, '{{this.id}}')">Remove Address</a>
-        <span class="spinner-grow text-primary spinner-grow-sm" role="status" hidden id="removeSelectedDeliveryAddressAnchorTagSpinner{{this.id}}"></span>
-        /
-        <a class="link-danger-dark toDisableAnchorTag" onclick="selectSavedAddress(event);" href="">Select a Different Address</a>
-    </h6>
-    <div class="card text-start">
-        <div class="card-body">
-            <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
-            <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-envelope me-2"></i>{{this.email}}</h6>
-            <p class="card-text">
-                <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
-                <div>
-                    <i class="bi bi-telephone me-2"></i>
-                    {{#if this.homephone}}{{this.homephone}}{{else}}<span class="ms-5">-</span>{{/if}}
-                </div>
-                <div><i class="bi bi-mailbox"></i><span class="ms-2">Delivery Address</span></i></div>
-                <div class="ms-4">{{this.address1}}</div>
-                <div class="ms-4">{{#if this.address2}}{{this.address2}}{{else}}<br>{{/if}}</div>
-                <div class="ms-4">{{this.pincode}}, {{this.city}}</div>
-                <div class="ms-4">{{this.state}}, {{this.country}}</div>
-                <div class="ms-4">{{this.landmark}}</div>
-            </p>
+    <h5 class="mb-0 pb-0">Add Delivery Address</h5>
+    <h6 class="text-muted mt-0 pt-0"><a onclick="displayDeliveryAddress(event);" class="link-danger-dark toDisableAnchorTag" href="">Select a Saved Address</a></h6>
+    <form class="row g-2 text-center" id="addDeliveryAddressForm" onsubmit="addDeliveryAddress(event);">
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputFirstName" class="form-label"><span class="requirement">*</span>First Name</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputFirstName" placeholder="First Name">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputLastName" class="form-label"><span class="requirement">*</span>Last Name</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputLastName" placeholder="Last Name">
+        </div>
+        <div class="col-12">
+            <label for="addDeliveryAddressFormInputEmail" class="form-label"><span class="requirement">*</span>Email</label>
+            <input type="email" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputEmail" placeholder="Email Address">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputMobile" class="form-label"><span class="requirement">*</span>Mobile Number</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputMobile" placeholder="Mobile Number">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputTelephone" class="form-label">Home Phone Number</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputTelephone" placeholder="Home Phone Number">
+        </div>
+        <div class="col-md-12">
+            <label for="addDeliveryAddressFormInputAddresss1" class="form-label"><span class="requirement">*</span>Address Line 1</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputAddresss1" placeholder="Address Line 1">
+        </div>
+        <div class="col-md-12">
+            <label for="addDeliveryAddressFormInputAddresss2" class="form-label">Address Line 2</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputAddresss2" placeholder="Address Line 2">
+        </div>
+        <div class="col-md-12">
+            <label for="addDeliveryAddressFormInputLandmark" class="form-label"><span class="requirement">*</span>Landmark</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputLandmark" placeholder="Landmark">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputCity" class="form-label"><span class="requirement">*</span>City</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputCity" placeholder="City">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputPincode" class="form-label"><span class="requirement">*</span>Pincode</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputPincode" placeholder="Pin/Zip Code">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputState" class="form-label"><span class="requirement">*</span>State</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputState" placeholder="State">
+        </div>
+        <div class="col-md-6">
+            <label for="addDeliveryAddressFormInputCountry" class="form-label"><span class="requirement">*</span>Country</label>
+            <input type="text" class="form-control form-control-sm toDisable" id="addDeliveryAddressFormInputCountry" placeholder="Country">
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-sm btn-outline-dark w-100 mt-3 toDisable">
+                <div class="spinner-border spinner-border-sm toHide" hidden role="status"></div>
+                Add
+            </button>
+        </div>
+    </form>
+    <div id="addDeliveryAddressError" class="errormessage"><br></div>
+    {% endverbatim %}
+</script>
+
+
+<script id="checkoutPageAddressHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="text-start container">
+        <h5>Payment and Delivery</h5>
+        <form class="row" onsubmit="placeOrder(event)">
+            <div class="col-12">Choose a Preferred Time of Delivery (optional)</div>
+            <div class="col-6 mb-3">
+                <label for="checkoutPreferredDate" class="form-label">Preferred Date</label>
+                <input type="date" class="form-control toDisable" pattern="\d{4}-\d{2}-\d{2}" id="checkoutPreferredDate" name="checkoutPreferredDate">
+            </div>
+            <div class="col-6 mb-3">
+                <label for="checkoutPreferredTime" class="form-label">Preferred Time</label>
+                <input type="time" class="form-control toDisable" pattern="[0-9]{2}:[0-9]{2}" id="checkoutPreferredTime" name="checkoutPreferredTime">
+            </div>
+            <div class="col-12">Choose a Method of Payment</div>
+            <div class="col-12 form-check ms-3">
+                <input class="form-check-input" type="radio" value="CCD" name="checkoutPaymentMethod" id="checkoutPaymentMethodCreditCard" disabled>
+                <label class="form-check-label" for="checkoutPaymentMethodCreditCard">
+                    <i class="bi bi-credit-card me-2"></i>Credit Card
+                </label>
+            </div>
+            <div class="col-12 form-check ms-3">
+                <input class="form-check-input" type="radio" value="DCD" name="checkoutPaymentMethod" id="checkoutPaymentMethodDebitCard" disabled>
+                <label class="form-check-label" for="checkoutPaymentMethodDebitCard">
+                    <i class="bi bi-credit-card-2-front me-2"></i>Debit Card
+                </label>
+            </div>
+            <div class="col-12 form-check ms-3">
+                <input class="form-check-input" type="radio" value="PPL" name="checkoutPaymentMethod" id="checkoutPaymentMethodPaypal" disabled>
+                <label class="form-check-label" for="checkoutPaymentMethodPaypal">
+                    <i class="bi bi-paypal me-2"></i>PayPal
+                </label>
+            </div>
+            <div class="col-12 form-check ms-3">
+                <input class="form-check-input toDisable" type="radio" value="COD" name="checkoutPaymentMethod" id="checkoutPaymentMethodCOD" checked>
+                <label class="form-check-label" for="checkoutPaymentMethodCOD">
+                    <i class="bi bi-wallet2 me-2"></i>Cash on Delivery
+                </label>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-sm w-100 btn-outline-dark toDisable">
+                    <div class="spinner-border spinner-border-sm" hidden id="chechoutPlaceOrderSpinner" role="status"></div>
+                    Place Order
+                </button>
+            </div>
+        </form>
+        <div class="errormessage" id="placeOrderError" style="height: 50px;"></div>
+    </div>
+    <div class="container">
+        <h5 class="mb-0 pb-0">Delivery Address</h5>
+        <h6 class="text-muted mt-0 pt-0"><a onclick="displayDeliveryAddress(event);" class="link-danger-dark toDisableAnchorTag" href="">Select a different Address</a></h6>
+        <div class="card">
+            <div class="card-body text-start">
+                <h5 class="card-title">{{first_name}} {{last_name}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{email}}</h6>
+                <p class="card-text">
+                    <div><i class="bi bi-phone me-2"></i>{{mobile}}</div>
+                    <div><i class="bi bi-telephone me-2"></i>{{#if landline}}{{landline}}{{else}}-{{/if}}</div>
+                    <div><i class="bi bi-mailbox me-2"></i>Delivery Address</div>
+                    <div class="ms-4">
+                        <span>{{address1}}</span><br>
+                        <span>{{#if address2}}{{address2}}{{else}}-{{/if}}</span><br>
+                        <span>{{city}} - {{pincode}}</span><br>
+                        <span>{{state}} - {{country}}</span><br>
+                    </div>
+                    <div><i class="bi bi-signpost me-2"></i>{{landmark}}</div>
+                </p>
+                <a class="card-link link-danger-dark toDisableAnchorTag" href="" onclick="removeSelectedDeliveryAddress(event, '{{id}}');">
+                    Remove
+                    <div class="spinner-grow spinner-grow-sm" id="removeDeliveryAddressSpinner" hidden role="status"></div>
+                </a>
+            </div>
         </div>
     </div>
-    <div class="table-responsive text-start my-3" id="paymentDiv">
-        <table class="table table-sm table-borderless align-middle caption-top">
-            <caption class="p-0 m-0">Make Payment</caption>
-            <tbody>
-                <tr>
-                    <td style="width: 50%;" class="m-0 p-0">Payment Method</td>
-                    <td style="width: 50%;" class="m-0 p-0">Cash On Delivery</td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn btn-outline-dark btn-sm w-100" data-bs-toggle="modal" data-bs-target="#placeOrderConfirmationModal">Place Order</button>
+    {% endverbatim %}
+</script>
+
+
+<script id="checkoutPageSelectAddressHandlebars" type="text/x-handlebars-template">
+    {% verbatim %}
+    <div class="modal fade" id="selectDeliveryAddressModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="selectDeliveryAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content container-fluid">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectDeliveryAddressModalLabel">Select a Delivery Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{#if address}}
+                        <div class="row row-cols-1 row-cols-md-2 g-1">
+                            {{#each address}}
+                            <div class="col">
+                                <div class="card h-100 w-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{this.first_name}} {{this.last_name}}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">{{this.email}}</h6>
+                                        <p class="card-text">
+                                            <div><i class="bi bi-phone me-2"></i>{{this.mobile}}</div>
+                                            <div><i class="bi bi-telephone me-2"></i>{{#if this.landline}}{{this.landline}}{{else}}-{{/if}}</div>
+                                            <div><i class="bi bi-mailbox me-2"></i>Delivery Address</div>
+                                            <div class="ms-4">
+                                                <span>{{this.address1}}</span><br>
+                                                <span>{{#if this.address2}}{{this.address2}}{{else}}-{{/if}}</span><br>
+                                                <span>{{this.city}} - {{this.pincode}}</span><br>
+                                                <span>{{this.state}} - {{this.country}}</span><br>
+                                            </div>
+                                            <div><i class="bi bi-signpost me-2"></i>{{this.landmark}}</div>
+                                        </p>
+                                        {{#if this.selected_address}}
+                                        <span>Selected Address</span>
+                                        {{else}}
+                                        <a href="" onclick="selectDeliveryAddress(event, '{{this.id}}');" class="card-link link-danger-dark">Select This Address</a>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                    <p>There are no saved addresses.</p>
+                    {{/if}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-dark" data-bs-dismiss="modal" id="selectDeliveryAddressModalCloseBtn">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
     {% endverbatim %}
 </script>
