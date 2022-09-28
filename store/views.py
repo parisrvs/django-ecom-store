@@ -10,9 +10,11 @@ from time import sleep
 from datetime import datetime, timedelta
 from .models import Discount, Order, Product, Address, Pincode, Variation, OrderItem, OrderCancellation
 from . import utility
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 ### Store Homepage
+@ensure_csrf_cookie
 def homepage(request):
     context = utility.get_products(request)
     return render(
@@ -117,6 +119,7 @@ def apply_discount(request):
 
 
 ### checkout page
+@ensure_csrf_cookie
 @login_required
 def checkout(request):
     if not request.session.get("cart", False):
@@ -393,6 +396,7 @@ def placeOrder(request):
 
 
 ### all orders page
+@ensure_csrf_cookie
 @login_required
 def orders(request):
     orders = utility.get_all_orders(request)
@@ -404,6 +408,7 @@ def orders(request):
 
 
 ### single order page
+@ensure_csrf_cookie
 @login_required
 def order(request, order_id):
     try:
@@ -483,6 +488,8 @@ def cancelOrder(request):
         })
 
 
+### Search page
+@ensure_csrf_cookie
 def search(request):
     response = utility.get_search_products(request)
     if not response:
@@ -499,6 +506,8 @@ def search(request):
     )
 
 
+### Products page not configured
+@ensure_csrf_cookie
 def products(request, product_slug):
     return render(
         request,
@@ -506,6 +515,8 @@ def products(request, product_slug):
     )
 
 
+### product variations page
+@ensure_csrf_cookie
 def product(request, product_slug, variation_id):
     try:
         variation_id = int(variation_id)
@@ -601,6 +612,7 @@ def checkDeliverability(request):
         
 
 ### user profile
+@ensure_csrf_cookie
 @login_required
 def profile(request):
     return render(
